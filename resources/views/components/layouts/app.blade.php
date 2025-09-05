@@ -6,7 +6,7 @@
         <link rel="icon" type="image/png" href="{{ asset('icon/avatar-people-user-profile-man-boy-cap-young-512.webp') }}">
 
 
-        <title>KALINAW</title>
+        <title>Agency</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -23,21 +23,31 @@
         <!-- Scripts -->
         @vite(['resources/js/app.js']) <!-- Ensure Alpine.js is loaded via Vite -->
 
-    </head>
-    <body class="">
-        {{ $slot }}
-        @yield('content')
+        <style>
+          /* Hide scrollbar for Chrome, Safari and Opera */
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
         
+        /* Hide scrollbar for IE, Edge */
+        .scrollbar-hide {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;     /* Firefox */
+        }
+        </style>
+    </head>
+    <body class="font-sans antialiased">
+  <!-- Navbar -->
+  @include('partials.first-header.first-nav')
+
+  
+        {{ $slot }}
+    
         
         <script>
             AOS.init();
           </script>
-        <!-- Alpine.js -->
-        <script type="module">
-            import Alpine from 'alpinejs'
-            window.Alpine = Alpine
-            Alpine.start()
-        </script>
+    
         
     </body>
 </html>

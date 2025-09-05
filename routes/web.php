@@ -9,9 +9,22 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+
+Route::get('/loginform', function () {
+    return view('loginform'); // looks for resources/views/loginform.blade.php
+})->name('loginform');
+
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+    // temporary route . ipaslak lang once may roles na //
+    Route::view('company', 'company')
+    ->middleware(['auth', 'verified'])
+    ->name('company');
+
+    ///
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
