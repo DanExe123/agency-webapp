@@ -23,7 +23,7 @@
 }
 </style>
 
-<body class="font-sans antialiased">
+<body class="font-sans antialiased" x-cloak>
 
   <!-- Navbar -->
   @include('partials.first-header.first-nav')

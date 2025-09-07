@@ -10,6 +10,8 @@ use App\Livewire\CredentialIndex;
 use App\Livewire\CredentialsVerification;
 use App\Livewire\FoundingInfo;
 use App\Livewire\CredentialComplete;
+use App\Livewire\CompanyProfile;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -36,7 +38,8 @@ Route::get('/loginform', Login::class)->name('loginform');
 
 
 Route::view('dashboard', 'dashboard')->middleware(['auth', 'verified'])  ->name('dashboard');
-Route::view('companies', 'company')->middleware(['auth', 'verified'])->name('company'); 
+Route::view('companies', 'company')->middleware(['auth', 'verified'])->name('company');
+Route::get('/company-profile', CompanyProfile::class)->name('company-profile');
 
 
 Route::middleware(['auth'])->group(function () {
