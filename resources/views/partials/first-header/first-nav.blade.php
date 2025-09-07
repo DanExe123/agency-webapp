@@ -10,11 +10,11 @@
                   <!-- underline bar -->
                   <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
                 </a>
-                <a href="#" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
+                <a href="" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
                   Agencies
                   <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
                 </a>
-                <a href="#" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
+                <a wire:navigate href="{{ route('company') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
                   Companies
                   <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
                 </a>
