@@ -48,7 +48,7 @@
         
         <div class="flex items-start justify-start">
             <flux:button type="submit" 
-                class="w-full !bg-[#0000006B] !text-white flex items-start justify-end gap-2">
+                class="w-full !bg-[#0000006B] !text-white flex items-center justify-center gap-2">
                 <span>{{ __('Sign in') }}</span>
             </flux:button>
         </div>

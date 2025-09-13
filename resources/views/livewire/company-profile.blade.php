@@ -98,7 +98,7 @@
         <x-phosphor.icons::regular.bookmark-simple
         class="w-4 h-4 text-black" />
     </button>
-    <button class="px-4 py-2 bg-gray-900 text-white rounded-md flex justify-start gap-2">
+    <button wire:navigate href="{{ route('chat-with-company') }}" class="px-4 py-2 bg-gray-900 text-white rounded-md flex justify-start gap-2">
         Chat With Company
         <x-phosphor.icons::regular.arrow-right
         class="w-4 h-4 text-white mt-1" />

@@ -11,6 +11,7 @@ use App\Livewire\CredentialsVerification;
 use App\Livewire\FoundingInfo;
 use App\Livewire\CredentialComplete;
 use App\Livewire\CompanyProfile;
+use App\Livewire\ChatWithCompany;
 
 
 Route::get('/', function () {
@@ -40,6 +41,7 @@ Route::get('/loginform', Login::class)->name('loginform');
 Route::view('dashboard', 'dashboard')->middleware(['auth', 'verified'])  ->name('dashboard');
 Route::view('companies', 'company')->middleware(['auth', 'verified'])->name('company');
 Route::get('/company-profile', CompanyProfile::class)->name('company-profile');
+Route::get('/chat-with-company', ChatWithCompany::class)->name('chat-with-company');
 
 
 Route::middleware(['auth'])->group(function () {

@@ -35,6 +35,9 @@
           scrollbar-width: none;     /* Firefox */
         }
         </style>
+        <style>
+          [x-cloak] { display: none !important; }
+        </style>
     </head>
     <body class="font-sans antialiased">
   <!-- Navbar -->
