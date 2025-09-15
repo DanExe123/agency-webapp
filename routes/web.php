@@ -64,19 +64,27 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
+Route::prefix('dashboard')
+    ->middleware(['auth', 'verified', 'role:Admin|Agency|Company'])
+    ->group(function () {
+        Route::view('/', 'dashboard')->name('dashboard');
+    });
+
+
+
 // Admin Dashboard
-Route::middleware(['auth', 'role:Admin'])->group(function () {
-    Route::get('/admin', AdminDashboard::class)->name('admin-dashboard'); 
-});
+//Route::middleware(['auth', 'role:Admin'])->group(function () {
+   // Route::get('/admin', AdminDashboard::class)->name('admin-dashboard'); 
+//});
 
 // Agency Dashboard
-Route::middleware(['auth', 'role:Agency'])->group(function () {
-    Route::get('/agency', AgencyDashboard::class)->name('agency-dashboard'); 
-});
+//Route::middleware(['auth', 'role:Agency'])->group(function () {
+//    Route::get('/agency', AgencyDashboard::class)->name('agency-dashboard'); 
+//});
 
 // Company Dashboard
-Route::middleware(['auth', 'role:Company'])->group(function () {
-    Route::get('/company', CompanyDashboard::class)->name('company-dashboard'); 
-});
+//Route::middleware(['auth', 'role:Company'])->group(function () {
+//Route::get('/company', CompanyDashboard::class)->name('company-dashboard'); 
+//});
 
 require __DIR__.'/auth.php';

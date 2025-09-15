@@ -12,6 +12,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
+
 #[Layout('components.layouts.auth')]
 class Login extends Component
 {
@@ -29,30 +30,29 @@ class Login extends Component
     public function login(): void
     {
         $this->validate();
-
+    
         $this->ensureIsNotRateLimited();
-
+    
         if (! Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
             RateLimiter::hit($this->throttleKey());
-
+    
             throw ValidationException::withMessages([
                 'email' => __('auth.failed'),
             ]);
         }
-
+    
         RateLimiter::clear($this->throttleKey());
-        Session::regenerate();
-
+        session()->regenerate(); // ✅ fixed
+    
         $user = Auth::user();
-
-        if ($user->hasRole('Admin')) {
-            $this->redirect(route('admin-dashboard'));
-        } elseif ($user->hasRole('Company')) {
-            $this->redirect(route('company-dashboard'));
-        } elseif ($user->hasRole('Agency')) {
-            $this->redirect(route('agency-dashboard'));
-        } 
+    
+        // Redirect to one unified dashboard
+        if ($user->hasAnyRole(['Admin', 'Company', 'Agency'])) {
+            $this->redirect(route('dashboard'));
+        }
     }
+    
+
 
     /**
      * Ensure the authentication request is not rate limited.

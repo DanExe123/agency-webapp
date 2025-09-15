@@ -3,47 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agency</title>
+  <title>{{ Auth::user()->getRoleNames()->first() ?? 'Dashboard' }}</title>
   <script src="https://unpkg.com/feather-icons"></script>
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
+
 <style>
   /* Hide scrollbar for Chrome, Safari and Opera */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 
-/* Hide scrollbar for IE, Edge */
-.scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
-}
+  /* Hide scrollbar for IE, Edge */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;     /* Firefox */
+  }
 </style>
 
 <body class="font-sans antialiased" x-cloak>
+  
+  {{-- Only show this layout if user has any of these roles --}}
+  @hasanyrole('Admin|Agency|Company')
+    
+    <!-- Navbar -->
+    @include('partials.first-header.first-nav')
+    @include('partials.first-header.second-nav')
 
-  <!-- Navbar -->
-  @include('partials.first-header.first-nav')
-  @include('partials.first-header.second-nav')
-  <!-- Hero Section -->
-  @include('partials.first-section')
- <!-- Most Popular Agencies Section -->
-  @include('partials.second-section')
-  <!-- Most Popular Agencies Section -->
-  @include('partials.third-section')
-<!-- company post Section -->
-  @include('partials.fourth-section')
-<!-- company post Section -->
-  @include('partials.fifth-section')
-  <!-- footer Section -->
-  @include('partials.footer')
+    <!-- Hero Section -->
+    @include('partials.first-section')
+
+    <!-- Most Popular Agencies Section -->
+    @include('partials.second-section')
+    @include('partials.third-section')
+
+    <!-- Company post Section -->
+    @include('partials.fourth-section')
+    @include('partials.fifth-section')
+
+    <!-- Footer Section -->
+    @include('partials.footer')
+
+  @else
+    <div class="text-center p-6">
+      <h2 class="text-xl font-bold text-red-600">Unauthorized</h2>
+      <p>You don’t have permission to view this page.</p>
+    </div>
+  @endhasanyrole
 
   <script>
     AOS.init();
   </script>
-
 </body>
 </html>
