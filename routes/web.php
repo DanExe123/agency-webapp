@@ -14,6 +14,17 @@ use App\Livewire\CompanyProfile;
 use App\Livewire\ChatWithCompany;
 
 
+//company
+use App\Livewire\CompanyDashboard;
+
+//ageny
+use App\Livewire\AgencyDashboard;
+
+//Admin
+use App\Livewire\AdminDashboard;
+
+
+
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
@@ -50,6 +61,22 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/profile', Profile::class)->name('settings.profile');
     Route::get('settings/password', Password::class)->name('settings.password');
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
+});
+
+
+// Admin Dashboard
+Route::middleware(['auth', 'role:Admin'])->group(function () {
+    Route::get('/admin', AdminDashboard::class)->name('admin-dashboard'); 
+});
+
+// Agency Dashboard
+Route::middleware(['auth', 'role:Agency'])->group(function () {
+    Route::get('/agency', AgencyDashboard::class)->name('agency-dashboard'); 
+});
+
+// Company Dashboard
+Route::middleware(['auth', 'role:Company'])->group(function () {
+    Route::get('/company', CompanyDashboard::class)->name('company-dashboard'); 
 });
 
 require __DIR__.'/auth.php';
