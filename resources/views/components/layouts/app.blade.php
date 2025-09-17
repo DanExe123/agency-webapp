@@ -41,8 +41,9 @@
     </head>
     <body class="font-sans antialiased">
   <!-- Navbar -->
+  @role('Agency|Company')
   @include('partials.first-header.first-nav')
-
+  @endrole
   
         {{ $slot }}
     

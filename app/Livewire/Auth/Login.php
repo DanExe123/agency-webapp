@@ -46,9 +46,10 @@ class Login extends Component
     
         $user = Auth::user();
     
-        // Redirect to one unified dashboard
-        if ($user->hasAnyRole(['Admin', 'Company', 'Agency'])) {
-            $this->redirect(route('dashboard'));
+        if ($user->hasRole('Admin')) {
+            $this->redirect(route('admin-dashboard')); // admin goes to admin-dashboard
+        } elseif ($user->hasAnyRole(['Company', 'Agency'])) {
+            $this->redirect(route('dashboard')); // others go to unified dashboard
         }
     }
     

@@ -65,17 +65,17 @@ Route::middleware(['auth'])->group(function () {
 
 
 Route::prefix('dashboard')
-    ->middleware(['auth', 'verified', 'role:Admin|Agency|Company'])
+    ->middleware(['auth', 'verified', 'role:Agency|Company'])
     ->group(function () {
         Route::view('/', 'dashboard')->name('dashboard');
     });
 
 
 
-// Admin Dashboard
-//Route::middleware(['auth', 'role:Admin'])->group(function () {
-   // Route::get('/admin', AdminDashboard::class)->name('admin-dashboard'); 
-//});
+
+Route::middleware(['auth', 'role:Admin'])->group(function () {
+   Route::get('/admin', AdminDashboard::class)->name('admin-dashboard'); 
+});
 
 // Agency Dashboard
 //Route::middleware(['auth', 'role:Agency'])->group(function () {
