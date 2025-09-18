@@ -14,12 +14,12 @@ use Livewire\Component;
 class Register extends Component
 {
     public string $name = '';
-
     public string $email = '';
-
     public string $password = '';
-
     public string $password_confirmation = '';
+
+    // ✅ new property to hold role from the form
+    public string $role = '';
 
     /**
      * Handle an incoming registration request.
@@ -30,14 +30,24 @@ class Register extends Component
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+            'role' => ['required', 'in:agency,company'], // ✅ role validation
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
 
-        event(new Registered(($user = User::create($validated))));
+        // Create user
+        $user = User::create($validated);
+
+        // ✅ Assign role using Spatie
+        $user->assignRole($validated['role']);
+
+        event(new Registered($user));
 
         Auth::login($user);
 
-        $this->redirect(route('loginform', absolute: false), navigate: true);
+        // Redirect after register
+       // $this->redirect(route('dashboard', absolute: false), navigate: true);
+
+       $this->redirect(route('credentials', absolute: false), navigate: true);
     }
 }

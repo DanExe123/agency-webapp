@@ -45,6 +45,11 @@ class Login extends Component
         session()->regenerate(); // ✅ fixed
     
         $user = Auth::user();
+
+        if (in_array($user->role, ['Agency', 'Company']) && ! $user->profile) {
+            $this->redirect(route('credentials'));
+            return;
+        }
     
         if ($user->hasRole('Admin')) {
             $this->redirect(route('admin-dashboard')); // admin goes to admin-dashboard

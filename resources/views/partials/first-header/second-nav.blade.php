@@ -67,11 +67,33 @@
   
         <!-- Right: Sign In Button -->
         <div>
-          <a wire:navigate href="{{ route('loginform') }}">
-            <button class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100">
-              Sign In
-            </button>
-          </a>
+          @guest
+              {{-- If not logged in, show Sign In and Create Account --}}
+              <div class="flex gap-2">
+                  <a wire:navigate href="{{ route('loginform') }}">
+                      <button class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100">
+                          Sign In
+                      </button>
+                  </a>
+
+                  <a wire:navigate href="{{ route('register') }}">
+                      <button class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100">
+                          Create Account
+                      </button>
+                  </a>
+              </div>
+          @endguest
+
+          @auth
+              {{-- If logged in, show Logout --}}
+              <form method="POST" action="{{ route('logout') }}">
+                  @csrf
+                  <button type="submit" class="px-4 py-2 border bg-black rounded-md text-sm font-medium hover:bg-gray-100 hover:text-black text-white">
+                    Log Out
+                  </button>
+              </form>
+          @endauth
+
           
         </div>
   

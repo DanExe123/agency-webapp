@@ -29,10 +29,12 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-// not authenticated page . connected sa login form 
-Route::get('/credentials', function () {
-    return view('credentials'); 
-});
+Route::get('/register', \App\Livewire\Auth\Register::class)
+    ->middleware('guest') // only show to logged out users
+    ->name('register');
+
+
+
 // credential complete page not autheticated page
 Route::get('/complete', function () {
     return view('complete'); 
@@ -40,19 +42,19 @@ Route::get('/complete', function () {
 
 
 // credential verification  - sugpon ni gro ka login based sa figma nila
-Route::get('/credentials-verification', CredentialsVerification::class)->name('credentials-verification');
-Route::get('/credential-complete', CredentialComplete::class)->name('credential-complete');
+//Route::get('/credentials-verification', CredentialsVerification::class)->name('credentials-verification');
+//Route::get('/credential-complete', CredentialComplete::class)->name('credential-complete');
 
 Route::get('/loginform', Login::class)->name('loginform');
 
-
-
-
-
-Route::view('dashboard', 'dashboard')->middleware(['auth', 'verified'])  ->name('dashboard');
-Route::view('companies', 'company')->middleware(['auth', 'verified'])->name('company');
-Route::get('/company-profile', CompanyProfile::class)->name('company-profile');
-Route::get('/chat-with-company', ChatWithCompany::class)->name('chat-with-company');
+// Shared routes for Company + Agency
+Route::middleware(['auth', 'verified', 'role:Company|Agency'])->group(function () {
+    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::get('/credentials', CredentialIndex::class)->name('credentials');
+    Route::view('companies', 'company')->name('company');
+    Route::get('/company-profile', CompanyProfile::class)->name('company-profile');
+    Route::get('/chat-with-company', ChatWithCompany::class)->name('chat-with-company');
+});
 
 
 Route::middleware(['auth'])->group(function () {
@@ -64,27 +66,11 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
-Route::prefix('dashboard')
-    ->middleware(['auth', 'verified', 'role:Agency|Company'])
-    ->group(function () {
-        Route::view('/', 'dashboard')->name('dashboard');
-    });
-
-
-
-
+// Admin Dashboard
 Route::middleware(['auth', 'role:Admin'])->group(function () {
-   Route::get('/admin', AdminDashboard::class)->name('admin-dashboard'); 
+    Route::get('/admin-dashboard', AdminDashboard::class)->name('admin-dashboard'); 
 });
 
-// Agency Dashboard
-//Route::middleware(['auth', 'role:Agency'])->group(function () {
-//    Route::get('/agency', AgencyDashboard::class)->name('agency-dashboard'); 
-//});
 
-// Company Dashboard
-//Route::middleware(['auth', 'role:Company'])->group(function () {
-//Route::get('/company', CompanyDashboard::class)->name('company-dashboard'); 
-//});
 
 require __DIR__.'/auth.php';
