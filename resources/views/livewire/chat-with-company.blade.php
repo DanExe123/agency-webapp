@@ -125,63 +125,61 @@
         <!-- Chatbox 
         <section class="col-span-8 bg-gray-50 border rounded-md flex flex-col h-[600px]">-->
             <section class="md:col-span-8 bg-gray-50 border rounded-md flex flex-col h-[600px]">
-            <!-- Header -->
-            <div class="flex items-center justify-between p-3 border-b">
-                <button class="p-2 rounded-full hover:bg-gray-200">
-                    <x-phosphor.icons::regular.arrow-left class="w-5 h-5" />
-                </button>
-                <h2 class="font-semibold text-gray-700">Messages (4)</h2>
-                <button class="p-2 rounded-full hover:bg-gray-200">
-                    <x-phosphor.icons::regular.video-camera class="w-5 h-5" />
-                </button>
-            </div>
-    
-            <!-- Messages -->
-            <div class="flex-1 p-4 space-y-4 overflow-y-auto">
-                <!-- Incoming -->
-                <div class="flex items-start space-x-2">
-                    <div class="w-8 h-8 bg-blue-500 rounded-full"></div>
-                    <div class="bg-gray-600 text-white px-3 py-2 rounded-lg max-w-xs">
-                        Hello! How are you?
-                        <span class="block text-xs text-gray-300 text-right">11:42 pm</span>
-                    </div>
+                <!-- Header -->
+                <div class="flex items-center justify-between p-3 border-b">
+                    <button class="p-2 rounded-full hover:bg-gray-200">
+                        <x-phosphor.icons::regular.arrow-left class="w-5 h-5" />
+                    </button>
+                    <h2 class="font-semibold text-gray-700">Messages </h2>
+                    <button class="p-2 rounded-full hover:bg-gray-200">
+                        <x-phosphor.icons::regular.video-camera class="w-5 h-5" />
+                    </button>
                 </div>
-    
-                <!-- Incoming -->
-                <div class="flex items-start space-x-2">
-                    <div class="w-8 h-8 bg-blue-500 rounded-full"></div>
-                    <div class="bg-gray-600 text-white px-3 py-2 rounded-lg max-w-xs">
-                        Can we discuss the details tomorrow?
-                    </div>
+            
+                <!-- Messages -->
+                <div class="flex-1 p-4 space-y-4 overflow-y-auto">
+                {{--    @foreach($messages as $message) --}} 
+                      {{--  @if($message->sender_id === auth()->id()) --}} 
+                            <!-- Outgoing -->
+                            <div class="flex justify-end">
+                                <div class="bg-black text-white px-3 py-2 rounded-lg max-w-xs">
+                                   
+                                    <span class="block text-xs text-gray-300 text-right">
+                                            {{--   {{ $message->created_at->format('h:i a') }} --}}
+                                    </span>
+                                </div>
+                            </div>
+                      {{-- @else --}}  
+                            <!-- Incoming -->
+                            <div class="flex items-start space-x-2">
+                                <div class="w-8 h-8 bg-blue-500 rounded-full"></div>
+                                <div class="bg-gray-600 text-white px-3 py-2 rounded-lg max-w-xs">
+                                  
+                                    <span class="block text-xs text-gray-300 text-right">
+                                      {{--   {{ $message->created_at->format('h:i a') }} --}}
+                                    </span>
+                                </div>
+                            </div>
+                      {{--   @endif --}}
+                   {{--  @endforeach --}}
                 </div>
-    
-                <!-- Outgoing -->
-                <div class="flex justify-end items-start space-x-2">
-                    <div class="bg-black text-white px-3 py-2 rounded-lg max-w-xs">
-                        Sure, that works for me ✅
-                    </div>
-                </div>
-    
-                <!-- Incoming -->
-                <div class="flex items-start space-x-2">
-                    <div class="w-8 h-8 bg-blue-500 rounded-full"></div>
-                    <div class="bg-gray-600 text-white px-3 py-2 rounded-lg max-w-xs">
-                        Great! See you then.
-                    </div>
-                </div>
-            </div>
-    
-            <!-- Footer Input -->
-            <div class="p-3 border-t flex items-center space-x-2">
-                <button class="p-2 rounded-full hover:bg-gray-200">
-                    <x-phosphor.icons::regular.image class="w-6 h-6 text-gray-600" />
-                </button>
-                <input type="text" placeholder="Write message here"
-                    class="flex-1 border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
-                <button class="p-2 rounded-md bg-gray-800 hover:bg-gray-900">
-                    <x-phosphor.icons::regular.paper-plane-right class="w-5 h-5 text-white" />
-                </button>
-            </div>
-        </section>
+            
+                <!-- Footer Input -->
+                <form wire:submit.prevent="sendMessage" class="p-3 border-t flex items-center space-x-2">
+                    <button type="button" class="p-2 rounded-full hover:bg-gray-200">
+                        <x-phosphor.icons::regular.image class="w-6 h-6 text-gray-600" />
+                    </button>
+                    <input type="text"
+                           placeholder="Write message here"
+                           wire:model.defer="messageText"
+                           class="flex-1 border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                    <button type="submit" class="p-2 rounded-md bg-gray-800 hover:bg-gray-900">
+                        <x-phosphor.icons::regular.paper-plane-right class="w-5 h-5 text-white" />
+                    </button>
+                </form>
+            </section>
+            ection>
+
+            
     </div>
     

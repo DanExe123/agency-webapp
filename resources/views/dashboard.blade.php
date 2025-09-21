@@ -3,12 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ Auth::user()->getRoleNames()->first() ?? 'Dashboard' }}</title>
+  @role('Agency')
+  <title>Agency | Account</title>
+  @endrole
+  @role('Company')
+  <title>Company | Account</title>
+  @endrole
   <script src="https://unpkg.com/feather-icons"></script>
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  
 </head>
 
 <style>
@@ -24,8 +30,9 @@
   }
 </style>
 
-<body class="font-sans antialiased" x-cloak>
+<body class="font-sans antialiased">
   
+
   {{-- Only show this layout if user has any of these roles --}}
   @hasanyrole('Admin|Agency|Company')
     

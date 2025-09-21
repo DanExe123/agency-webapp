@@ -122,30 +122,40 @@
 
         <!-- Main Listings -->
         <main class="col-span-9 space-y-4">
-            @foreach (range(1,10) as $i)
-            <div class="flex items-center justify-between bg-white border rounded-md p-4">
-                <!-- Left -->
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-md" style="background: {{ ['red','blue','green','gray','orange'][array_rand(['red','blue','green','gray','orange'])] }}"></div>
-                    <div>
-                        <h4 class="font-semibold">Company Name</h4>
-                        <p class="text-sm text-gray-500 flex items-center space-x-1">
-                            <x-phosphor.icons::regular.map-pin class="w-4 h-4 text-gray-600"/>
-                            <span>Bacolod City</span>
+            @foreach ($posts as $post)
+                <div class="flex items-center justify-between bg-white border rounded-md p-4">
+                    <!-- Left -->
+                    <div class="flex items-center space-x-3">
+                        @if($post->logo)
+                        <img src="{{ $post->logo ?? 'https://via.placeholder.com/40' }}" alt="{{ $post->company_name }}" class="w-8 h-8 rounded-full">
+                    @else
+                        <!-- Fallback if no logo -->
+                        <div class="w-10 h-10 rounded-md bg-gray-300 flex items-center justify-center text-white font-bold">
+                            {{ strtoupper(substr($post->company_name ?? 'C', 0, 1)) }}
+                        </div>
+                    @endif
+                
+                        <div>
+                            <h4 class="font-semibold">{{ $post->company_name ?? 'Company Name' }}</h4>
+                            <p class="text-sm text-gray-500 flex items-center space-x-1">
+                                <x-phosphor.icons::regular.map-pin class="w-4 h-4 text-gray-600"/>
+                                <span>{{ $post->location ?? 'Bacolod City' }}</span>
         
-                            <span class="px-2 py-0.5 rounded-full text-xs">Need Full Time Security Guard</span>
-                        </p>
+                                <span class="px-2 py-0.5 rounded-full text-xs">{{ $post->job_title ?? 'Need Full Time Security Guard' }}</span>
+                            </p>
+                        </div>
                     </div>
+        
+                    <!-- Right -->
+                    <button wire:click="goToCompanyProfile({{ $post->id }})" 
+                            class="flex items-center bg-gray-100 px-4 py-2 rounded-md hover:bg-gray-200">
+                        Open
+                        <x-phosphor.icons::regular.arrow-right class="w-5 h-5 ml-2" />
+                    </button>
                 </div>
-                <!-- Right -->
-                <a wire:navigate href="{{ route('company-profile') }}">
-                <button class="flex items-center bg-gray-100 px-4 py-2 rounded-md hover:bg-gray-200">
-                    Open
-                    <x-phosphor.icons::regular.arrow-right class="w-5 h-5 ml-2" />
-                </button></a>
-            </div>
             @endforeach
         </main>
+        
     </div>
 
     <!-- Pagination -->

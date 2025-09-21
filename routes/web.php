@@ -12,6 +12,11 @@ use App\Livewire\FoundingInfo;
 use App\Livewire\CredentialComplete;
 use App\Livewire\CompanyProfile;
 use App\Livewire\ChatWithCompany;
+use App\Livewire\AgenciesMessages;
+use App\Livewire\CreatePost;
+use App\Livewire\CompanyPosted;
+use App\Livewire\MostPopular;
+
 
 
 //company
@@ -52,10 +57,19 @@ Route::middleware(['auth', 'verified', 'role:Company|Agency'])->group(function (
     Route::view('dashboard', 'dashboard')->name('dashboard');
     Route::get('/credentials', CredentialIndex::class)->name('credentials');
     Route::view('companies', 'company')->name('company');
-    Route::get('/company-profile', CompanyProfile::class)->name('company-profile');
+    Route::get('company-profile/{post}', CompanyProfile::class)->name('company-profile');
     Route::get('/chat-with-company', ChatWithCompany::class)->name('chat-with-company');
+    Route::get('/Agencies-messages', AgenciesMessages::class)->name('agencies-messages');
+    Route::get('/posted', CompanyPosted::class)->name('company-posted');
+    Route::get('/Most-popular', MostPopular::class)->name('most-popular');
+
 });
 
+// specific feature  function for company only 
+Route::middleware(['auth', 'verified', 'role:Company'])->group(function () {
+    Route::get('/Agencies-messages', AgenciesMessages::class)->name('agencies-messages');
+    Route::get('/Create-Post', CreatePost::class)->name('create-post');
+});
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
