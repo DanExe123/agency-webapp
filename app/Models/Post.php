@@ -11,17 +11,25 @@ class Post extends Model
 
     // Mass assignable fields
     protected $fillable = [
-        'company_name',
-        'logo',
-        'featured',
-        'website',
-        'phone',
-        'email',
+        'user_id',
         'description',
         'requirements',
-        'location',
         'needs',
-        'founded_in',
-        'company_size',
+    
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function resolveRouteBinding($value, $field = null)
+    {
+        return $this->with('user.profile')
+                    ->where($field ?? $this->getRouteKeyName(), $value)
+                    ->firstOrFail();
+    }
+
+
+
 }

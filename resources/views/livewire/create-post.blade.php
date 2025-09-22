@@ -61,19 +61,9 @@
 <div class="p-6 space-y-4 max-w-3xl mx-auto">
     <h2 class="text-2xl font-bold">Create Job Post</h2>
     <div class="p-6 space-y-4 max-w-3xl mx-auto">
-        <x-input label="Company Name" placeholder="Enter company name" wire:model.defer="companyName" />
-        <x-input label="Company Logo URL" placeholder="https://example.com/logo.png" wire:model.defer="logo" />
-        <x-checkbox label="Featured" wire:model.defer="featured" />
-       {{--  <x-input label="Job Type" placeholder="Full Time / Part Time" wire:model.defer="jobType" /> --}}
-        <x-input label="Website" placeholder="https://Company.com" wire:model.defer="website" />
-        <x-input label="Phone" placeholder="+63 912 345 6789" wire:model.defer="phone" />
-        <x-input label="Email" placeholder="CompanyName@gmail.com" wire:model.defer="email" />
         <x-textarea label="Job Description" placeholder="Enter company description..." wire:model.defer="description" />
         <x-textarea label="Requirements" placeholder="Enter job requirements..." wire:model.defer="requirements" />
-        <x-input label="Location" placeholder="City, Region" wire:model.defer="location" />
         <x-input label="Needs" placeholder="Number of employees needed" wire:model.defer="needs" />
-        <x-input label="Founded In" type="date" wire:model.defer="foundedIn" />
-        <x-input label="Company Size" placeholder="e.g., 120-300 Employees" wire:model.defer="companySize" />
     
         <x-button wire:click="submit" text="white" class="!bg-black !text-white !w-full">
             Submit Post

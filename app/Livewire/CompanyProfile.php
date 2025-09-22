@@ -7,7 +7,7 @@ use App\Models\Post;
 
 class CompanyProfile extends Component
 {
-    public $post;
+    public Post $post;
 
     public function mount(Post $post)
     {
@@ -15,8 +15,11 @@ class CompanyProfile extends Component
     }
 
 
+
     public function render()
     {
         return view('livewire.company-profile');
     }
 }
+
+

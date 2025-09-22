@@ -13,18 +13,10 @@ return new class extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->string('company_name');
-            $table->string('logo')->nullable();
-            $table->boolean('featured')->default(false);
-            $table->string('website')->nullable();
-            $table->string('phone');
-            $table->string('email');
+            $table->unsignedBigInteger('user_id'); // Add this line
             $table->text('description');
             $table->text('requirements')->nullable();
-            $table->string('location');
             $table->string('needs');
-            $table->date('founded_in')->nullable();
-            $table->string('company_size')->nullable();
             $table->timestamps();
         });
     }

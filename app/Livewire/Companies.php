@@ -9,12 +9,11 @@ class Companies extends Component
 {
     public $posts; // if you want to display a list of posts
 
-    public function mount()
+     public function mount()
     {
-        // Load all posts (or filter as needed)
-        $this->posts = Post::all();
+        // Eager load both 'user' and 'user.profile'
+        $this->posts = Post::with('user.profile')->get();
     }
-
     /**
      * Redirect to the company profile page for a specific post.
      *
@@ -24,6 +23,7 @@ class Companies extends Component
     {
         return redirect()->route('company-profile', ['post' => $postId]);
     }
+
 
     public function render()
     {
