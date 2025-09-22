@@ -14,13 +14,13 @@ class CredentialIndex extends Component
     public $step = 1;
 
     // Step 1
-    public $logo, $certificate, $valid_id, $about_us;
+    public $logo, $bpl, $dti, $about_us;
 
     // Step 2
     public $organization_type, $industry_type, $team_size, $year_established, $website, $vision;
 
     // Step 3
-    public $address, $phone, $email;
+    public $address, $phone ;
 
     public function mount()
     {
@@ -45,8 +45,8 @@ class CredentialIndex extends Component
 
             // keep existing file paths (so previews can work if you want)
             $this->logo = $profile->logo_path;
-            $this->certificate = $profile->certificate_path;
-            $this->valid_id = $profile->valid_id_path;
+            $this->bpl = $profile->bpl_path;
+            $this->dti = $profile->dti_path;
         }
     }
 
@@ -55,50 +55,50 @@ class CredentialIndex extends Component
         $data = [];
 
         if ($this->step === 1) {
-    $this->validate([
-        'logo' => 'required',
-        'certificate' => 'required',
-        'valid_id' => 'required',
-        'about_us' => 'required|string|min:10',
-    ]);
+            $this->validate([
+                'logo' => 'required',
+                'bpl'  => 'required',
+                'dti'  => 'required',
+                'about_us' => 'required|string|min:10',
+            ]);
 
-    // Logo
-    if ($this->logo instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
-        $logoPath = $this->logo->store('uploads/logos', 'public');
-        $logoOriginal = $this->logo->getClientOriginalName();
-    } else {
-        $logoPath = $this->logo;
-        $logoOriginal = UserProfile::where('user_id', Auth::id())->value('logo_original_name'); // keep old
-    }
+            // Logo
+            if ($this->logo instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
+                $logoPath = $this->logo->store('uploads/logos', 'public');
+                $logoOriginal = $this->logo->getClientOriginalName();
+            } else {
+                $logoPath = $this->logo;
+                $logoOriginal = UserProfile::where('user_id', Auth::id())->value('logo_original_name'); // keep old
+            }
 
-    // Certificate
-    if ($this->certificate instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
-        $certificatePath = $this->certificate->store('uploads/certificates', 'public');
-        $certificateOriginal = $this->certificate->getClientOriginalName();
-    } else {
-        $certificatePath = $this->certificate;
-        $certificateOriginal = UserProfile::where('user_id', Auth::id())->value('certificate_original_name');
-    }
+            // bpl
+            if ($this->bpl instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
+                $bplPath = $this->bpl->store('uploads/bpls', 'public');
+                $bplOriginal = $this->bpl->getClientOriginalName();
+            } else {
+                $bplPath = $this->bpl;
+                $bplOriginal = UserProfile::where('user_id', Auth::id())->value('bpl_original_name');
+            }
 
-    // Valid ID
-    if ($this->valid_id instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
-        $validIdPath = $this->valid_id->store('uploads/valid_ids', 'public');
-        $validIdOriginal = $this->valid_id->getClientOriginalName();
-    } else {
-        $validIdPath = $this->valid_id;
-        $validIdOriginal = UserProfile::where('user_id', Auth::id())->value('valid_id_original_name');
-    }
+            // Valid ID
+            if ($this->dti instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
+                $validIdPath = $this->dti->store('uploads/dtis', 'public');
+                $validIdOriginal = $this->dti->getClientOriginalName();
+            } else {
+                $validIdPath = $this->dti;
+                $validIdOriginal = UserProfile::where('user_id', Auth::id())->value('dti_original_name');
+            }
 
-    $data = [
-        'about_us'                  => $this->about_us,
-        'logo_path'                 => $logoPath,
-        'logo_original_name'        => $logoOriginal,
-        'certificate_path'          => $certificatePath,
-        'certificate_original_name' => $certificateOriginal,
-        'valid_id_path'             => $validIdPath,
-        'valid_id_original_name'    => $validIdOriginal,
-    ];
-}
+            $data = [
+                'about_us'                  => $this->about_us,
+                'logo_path'                 => $logoPath,
+                'logo_original_name'        => $logoOriginal,
+                'bpl_path'                  => $bplPath,
+                'bpl_original_name'         => $bplOriginal,
+                'dti_path'                  => $validIdPath,
+                'dti_original_name'         => $validIdOriginal,
+            ];
+        }
 
         if ($this->step === 2) {
             $this->validate([
@@ -122,14 +122,16 @@ class CredentialIndex extends Component
         if ($this->step === 3) {
             $this->validate([
                 'address' => 'required',
-                'phone' => 'required',
-                'email' => 'required|email',
+                'phone' => [
+                    'required',
+                    'digits:11',
+                    'unique:user_profiles,phone'
+                ],
             ]);
 
             $data = [
                 'address' => $this->address,
                 'phone' => $this->phone,
-                'email' => $this->email,
             ];
         }
 

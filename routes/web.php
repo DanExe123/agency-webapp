@@ -28,6 +28,8 @@ use App\Livewire\AgencyDashboard;
 //Admin
 use App\Livewire\AdminDashboard;
 
+use App\Http\Controllers\DownloadController;
+
 
 
 Route::get('/', function () {
@@ -37,6 +39,12 @@ Route::get('/', function () {
 Route::get('/register', \App\Livewire\Auth\Register::class)
     ->middleware('guest') // only show to logged out users
     ->name('register');
+
+
+Route::get('/download/{file}', [DownloadController::class, 'file'])
+    ->where('file', '.*') // allow slashes
+    ->name('download');
+
 
 
 
@@ -54,8 +62,8 @@ Route::get('/loginform', Login::class)->name('loginform');
 
 // Shared routes for Company + Agency
 Route::middleware(['auth', 'verified', 'role:Company|Agency'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
     Route::get('/credentials', CredentialIndex::class)->name('credentials');
+    Route::view('dashboard', 'dashboard')->name('dashboard');
     Route::view('companies', 'company')->name('company');
     Route::get('company-profile/{post}', CompanyProfile::class)->name('company-profile');
     Route::get('/chat-with-company', ChatWithCompany::class)->name('chat-with-company');

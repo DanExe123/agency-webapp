@@ -18,11 +18,15 @@
 
                 <!-- Right: Logout -->
                 <div>
-                    <a wire:navigate href="{{ route('loginform') }}">
-                        <button class="px-4 py-2 border bg-black rounded-md text-sm font-medium hover:bg-gray-100 hover:text-black text-white">
-                            Log Out
-                        </button>
-                    </a>
+                    @auth
+                        {{-- If logged in, show Logout --}}
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="px-4 py-2 border bg-black rounded-md text-sm font-medium hover:bg-gray-100 hover:text-black text-white">
+                                Log Out
+                            </button>
+                        </form>
+                    @endauth
                 </div>
 
             </div>
@@ -52,48 +56,68 @@
             </div>
         </div>
 
+        
         <!-- Table -->
         <div class="bg-white rounded-lg shadow overflow-hidden">
             <table class="min-w-full text-sm text-left">
                 <thead class="bg-gray-50 border-b">
                     <tr>
-                        <th class="px-4 py-2">Document</th>
-                        <th class="px-4 py-2">Certificate</th>
-                        <th class="px-4 py-2">Valid ID</th>
                         <th class="px-4 py-2">Agency Name</th>
+                        <th class="px-4 py-2">Email</th>
                         <th class="px-4 py-2">Organization</th>
                         <th class="px-4 py-2">Industry</th>
                         <th class="px-4 py-2">Year</th>
                         <th class="px-4 py-2">Website</th>
-                        <th class="px-4 py-2">Email</th>
+                        <th class="px-4 py-2">Account status</th>
                         <th class="px-4 py-2">Action</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y">
-                    <tr x-data="{ openReject: false }">
-                        <td class="px-4 py-2">Doc123</td>
-                        <td class="px-4 py-2">Certified</td>
-                        <td class="px-4 py-2">Passport</td>
-                        <td class="px-4 py-2">SecureWorks</td>
-                        <td class="px-4 py-2">Private</td>
-                        <td class="px-4 py-2">Security</td>
-                        <td class="px-4 py-2">2008</td>
-                        <td class="px-4 py-2 text-blue-600">www.secureworks.com</td>
-                        <td class="px-4 py-2">info@secureworks.com</td>
-                        <td class="px-4 py-2 flex gap-2">
-                            <!-- Approve -->
-                            <button class="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700">
-                                Approve
-                            </button>
+                @foreach($profiles as $profile)
+                <tr x-data="{ openDocs: false, openReject: false }">
+                    <td class="px-4 py-2">{{ $profile->user->name ?? 'N/A' }}</td>
+                    <td class="px-4 py-2">{{ $profile->user->email }}</td>
+                    <td class="px-4 py-2">{{ $profile->organization_type }}</td>
+                    <td class="px-4 py-2">{{ $profile->industry_type }}</td>
+                    <td class="px-4 py-2">{{ optional($profile->year_established)->format('Y') }}</td>
+                    <td class="px-4 py-2 text-blue-600">{{ $profile->website }}</td>
+                    <td class="px-4 py-2">
+                        <span class="
+                            px-2 py-1 rounded-full text-xs font-semibold
+                            @if($profile->account_status === 'pending') bg-yellow-100 text-yellow-700
+                            @elseif($profile->account_status === 'verified') bg-green-100 text-green-700
+                            @elseif($profile->account_status === 'rejected') bg-red-100 text-red-700
+                            @endif
+                        ">
+                            {{ ucfirst($profile->account_status) }}
+                        </span>
+                    </td>
 
-                            <!-- Reject -->
-                            <button @click="openReject = true"
-                                class="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700">
-                                Reject
-                            </button>
+                    <td class="px-4 py-2 flex gap-2">
+                        
+                        <!-- View Documents -->
+                        <button @click="openDocs = true"
+                                class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            View Docs
+                        </button>
 
-                         <!-- Reject Modal -->
-                            <div x-show="openReject"
+                        <!-- Approve -->
+                        <button 
+                            wire:click="approve({{ $profile->id }})"
+                            class="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700">
+                            Approve
+                        </button>
+
+                        <!-- Reject -->
+                        <button 
+                            wire:click="openRejectModal({{ $profile->id }})"
+                            class="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700">
+                            Reject
+                        </button>
+
+
+                        <!-- Documents Modal -->
+                        <div x-show="openDocs"
                             class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
                             x-cloak
                             x-transition:enter="transition ease-out duration-300"
@@ -102,7 +126,7 @@
                             x-transition:leave="transition ease-in duration-200"
                             x-transition:leave-start="opacity-100"
                             x-transition:leave-end="opacity-0">
-
+                            
                             <div class="bg-white w-96 rounded-lg shadow-lg p-6"
                                 x-transition:enter="transition ease-out duration-300 transform"
                                 x-transition:enter-start="scale-90 opacity-0"
@@ -111,25 +135,79 @@
                                 x-transition:leave-start="scale-100 opacity-100"
                                 x-transition:leave-end="scale-90 opacity-0">
                                 
-                            <h2 class="text-lg font-semibold mb-4">Reject Feedback</h2>
-                            <textarea class="w-full border rounded-md p-2 mb-4"
+                                <h2 class="text-lg font-semibold mb-4">Documents</h2>
+
+                                <ul class="space-y-2">
+                                    @if($profile->logo_path)
+                                        <li>
+                                            <a href="{{ route('download', ['file' => $profile->logo_path]) }}"
+                                            class="text-blue-600 underline">
+                                                {{ $profile->logo_original_name ?? 'Logo' }}
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if($profile->bpl_path)
+                                        <li>
+                                            <a href="{{ route('download', ['file' => $profile->bpl_path]) }}"
+                                            class="text-blue-600 underline">
+                                                {{ $profile->bpl_original_name ?? 'Business Permit License' }}
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if($profile->dti_path)
+                                        <li>
+                                            <a href="{{ route('download', ['file' => $profile->dti_path]) }}"
+                                            class="text-blue-600 underline">
+                                                {{ $profile->dti_original_name ?? 'DTI Certificate' }}
+                                            </a>
+                                        </li>
+                                    @endif
+                                </ul>
+
+                                <div class="flex justify-end mt-4">
+                                    <button @click="openDocs = false"
+                                            class="px-3 py-1 border rounded-md hover:bg-gray-100">
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reject Modal -->
+                        @if($showRejectModal)
+                        <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+                            x-transition>
+                            <div class="bg-white w-96 rounded-lg shadow-lg p-6">
+                                <h2 class="text-lg font-semibold mb-4">Reject Feedback</h2>
+
+                                <!-- Bind to Livewire -->
+                                <textarea wire:model.defer="rejectFeedback"
+                                        class="w-full border rounded-md p-2 mb-4"
                                         rows="4"
-                                        placeholder="Enter rejection reason..."></textarea>
-                            <div class="flex justify-end gap-2">
-                                <button @click="openReject = false"
-                                    class="px-3 py-1 border rounded-md hover:bg-gray-100">
-                                    Cancel
-                                </button>
-                                <button @click="openReject = false"
-                                    class="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700">
-                                    Submit
-                                </button>
+                                        placeholder="Enter rejection feedback..."></textarea>
+                                @error('rejectFeedback')
+                                    <p class="text-red-600 text-sm">{{ $message }}</p>
+                                @enderror
+
+                                <div class="flex justify-end gap-2">
+                                    <button wire:click="closeRejectModal"
+                                            class="px-3 py-1 border rounded-md hover:bg-gray-100">
+                                        Cancel
+                                    </button>
+
+                                    <!-- Call Livewire reject() -->
+                                    <button wire:click="reject"
+                                            class="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700">
+                                        Submit
+                                    </button>
+                                </div>
                             </div>
-                            </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <!-- More rows -->
+                        </div>
+                        @endif
+
+                    </td>
+                </tr>
+                @endforeach
                 </tbody>
             </table>
         </div>

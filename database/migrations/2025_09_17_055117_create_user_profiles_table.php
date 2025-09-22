@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->text('about_us')->nullable();
             $table->string('logo_path')->nullable();
-            $table->string('certificate_path')->nullable();
-            $table->string('valid_id_path')->nullable();
+            $table->string('bpl_path')->nullable();
+            $table->string('dti_path')->nullable();
             $table->string('organization_type')->nullable();
             $table->string('industry_type')->nullable();
             $table->string('team_size')->nullable();
@@ -25,9 +25,13 @@ return new class extends Migration
             $table->string('website')->nullable();
             $table->text('vision')->nullable();
             $table->string('address')->nullable();
-            $table->string('phone')->nullable();
-            $table->string('email')->nullable();
+            $table->string('phone', 11)->unique()->nullable();
             $table->boolean('is_verified')->default(false);
+            $table->enum('account_status', ['pending', 'verified', 'rejected'])->default('pending');
+            $table->text('rejection_feedback')->nullable();
+            $table->string('logo_original_name')->nullable();
+            $table->string('bpl_original_name')->nullable();
+            $table->string('dti_original_name')->nullable();
             $table->timestamps();
         });
 

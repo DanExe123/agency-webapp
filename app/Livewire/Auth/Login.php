@@ -27,37 +27,42 @@ class Login extends Component
     /**
      * Handle an incoming authentication request.
      */
-    public function login(): void
+    public function login(): mixed
     {
         $this->validate();
-    
+
         $this->ensureIsNotRateLimited();
-    
+
         if (! Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
             RateLimiter::hit($this->throttleKey());
-    
+
             throw ValidationException::withMessages([
                 'email' => __('auth.failed'),
             ]);
         }
-    
-        RateLimiter::clear($this->throttleKey());
-        session()->regenerate(); // ✅ fixed
-    
-        $user = Auth::user();
 
-        if (in_array($user->role, ['Agency', 'Company']) && ! $user->profile) {
-            $this->redirect(route('credentials'));
-            return;
+        RateLimiter::clear($this->throttleKey());
+        session()->regenerate();
+
+        $user = Auth::user()->load('profile'); // ✅ eager load profile
+
+        // 🚨 Force credentials route if Agency/Company has no profile
+        if ($user->hasAnyRole(['Agency', 'Company']) && $user->profile === null) {
+            return redirect()->route('credentials'); // ✅ always works
         }
-    
+
         if ($user->hasRole('Admin')) {
-            $this->redirect(route('admin-dashboard')); // admin goes to admin-dashboard
-        } elseif ($user->hasAnyRole(['Company', 'Agency'])) {
-            $this->redirect(route('dashboard')); // others go to unified dashboard
+            return redirect()->route('admin-dashboard');
         }
+
+        if ($user->hasAnyRole(['Company', 'Agency'])) {
+            return redirect()->route('dashboard');
+        }
+
+        // fallback
+        return redirect()->intended('/');
     }
-    
+
 
 
     /**
