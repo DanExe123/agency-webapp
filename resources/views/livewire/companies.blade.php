@@ -122,44 +122,51 @@
 
         <!-- Main Listings -->
         <main class="col-span-9 space-y-4">
-           @foreach ($posts as $post)
-    @php
-        $profile = $post->user->profile ?? null;
-    @endphp
-
-    <div class="flex items-center justify-between bg-white border rounded-md p-4">
-        <!-- Left -->
-        <div class="flex items-center space-x-3">
-            @if($profile && $profile->logo_path)
-                <img src="{{ $profile->logo_path ? asset('storage/' . $profile->logo_path) : 'https://via.placeholder.com/40' }}" 
-                     alt="{{ $post->user->name }}" class="w-8 h-8 rounded-full">
-            @else
-                <div class="w-10 h-10 rounded-md bg-gray-300 flex items-center justify-center text-white font-bold">
-                    {{ strtoupper(substr($post->user->name ?? 'C', 0, 1)) }}
+            @forelse ($posts as $post)
+            @php
+                $profile = $post->user->profile ?? null;
+            @endphp
+        
+            <div class="flex items-center justify-between bg-white border rounded-md p-4">
+                <!-- Left -->
+                <div class="flex items-center space-x-3">
+                    @if($profile && $profile->logo_path)
+                        <img src="{{ $profile->logo_path ? asset('storage/' . $profile->logo_path) : 'https://via.placeholder.com/40' }}" 
+                             alt="{{ $post->user->name }}" class="w-8 h-8 rounded-full">
+                    @else
+                        <div class="w-10 h-10 rounded-md bg-gray-300 flex items-center justify-center text-white font-bold">
+                            {{ strtoupper(substr($post->user->name ?? 'C', 0, 1)) }}
+                        </div>
+                    @endif
+        
+                    <div>
+                        <h4 class="font-semibold">{{ $profile->company_name ?? $post->user->name }}</h4>
+                        <p class="text-sm text-gray-500 flex items-center space-x-1">
+                            <x-phosphor.icons::regular.map-pin class="w-4 h-4 text-gray-600"/>
+                            <span>{{ $profile->address ?? 'N/A' }}</span>
+        
+                            <span class="px-2 py-0.5 rounded-full text-xs">
+                                {{ $post->description ?? 'N/A' }}
+                            </span>
+                        </p>
+                    </div>
                 </div>
-            @endif
-
-            <div>
-                <h4 class="font-semibold">{{ $profile->company_name ?? $post->user->name }}</h4>
-                <p class="text-sm text-gray-500 flex items-center space-x-1">
-                    <x-phosphor.icons::regular.map-pin class="w-4 h-4 text-gray-600"/>
-                    <span>{{ $profile->user->profile->address ?? ' N/a' }}</span>
-
-                    <span class="px-2 py-0.5 rounded-full text-xs">
-                        {{ $post->description ?? 'n/a' }}
-                    </span>
-                </p>
+        
+                <!-- Right -->
+                <button wire:click="goToCompanyProfile({{ $post->id }})" 
+                        class="flex items-center bg-gray-100 px-4 py-2 rounded-md hover:bg-gray-200">
+                    Open
+                    <x-phosphor.icons::regular.arrow-right class="w-5 h-5 ml-2" />
+                </button>
             </div>
-        </div>
-
-        <!-- Right -->
-        <button wire:click="goToCompanyProfile({{ $post->id }})" 
-                class="flex items-center bg-gray-100 px-4 py-2 rounded-md hover:bg-gray-200">
-            Open
-            <x-phosphor.icons::regular.arrow-right class="w-5 h-5 ml-2" />
-        </button>
-    </div>
-@endforeach
+        @empty
+        <div class="text-center py-6 bg-gray-50 border rounded-md">
+            <div class="flex items-center justify-center space-x-2 text-gray-500">
+                <x-phosphor.icons::regular.building-office class="w-5 h-5" />
+                <span>No companies have posted right now.</span>
+            </div>
+        </div>        
+        @endforelse        
 
         </main>
         

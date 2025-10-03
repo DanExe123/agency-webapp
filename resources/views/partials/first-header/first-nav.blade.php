@@ -29,8 +29,12 @@
             <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
         </a> 
           @endhasrole
-                    
-
+                @hasanyrole('Company|Agency')    
+          <a wire:navigate href="{{ route('chatify') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
+            CHAT
+            <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+        </a> 
+        @endhasanyrole
               </nav>              
         </div>
   
