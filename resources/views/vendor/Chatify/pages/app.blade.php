@@ -139,12 +139,37 @@
                 {{-- header back button, avatar and user name --}}
                 <div class="chatify-d-flex chatify-justify-content-between chatify-align-items-center">
                     <a href="#" class="show-listView"><i class="fas fa-arrow-left"></i></a>
-                    <div class="avatar av-s header-avatar" style="margin: 0px 10px; margin-top: -5px; margin-bottom: -5px;">    
+                    <div class="" style="margin: 0px 10px; margin-top: -5px; margin-bottom: -5px;">    
+                        <img 
+                        src="{{ Auth::user()->profile?->logo_path 
+                            ? asset('storage/' . Auth::user()->profile->logo_path) 
+                            : 'https://via.placeholder.com/80' }}" 
+                        class="rounded-full w-10 h-10 object-cover"
+                    />
                     </div>
                     <a href="#" class="user-name"></a>
                 </div>
                 {{-- header buttons --}}
                 <nav class="m-header-right">
+                    <!--video call -->
+                    <div class="flex items-center gap-3">
+                        <button id="startCallBtn" 
+                            class=" hover:!text-gray-400 p-2  flex items-center justify-center transition">
+                            <x-phosphor.icons::regular.video-camera class="w-6 h-6 !text-[#354657]" />
+                        </button>
+                    </div> 
+                    <div id="videoCallModal" class="fixed inset-0 bg-black/70 flex items-center justify-center hidden">
+                        <div class="bg-white p-4 rounded-xl shadow-lg w-[600px] flex flex-col items-center">
+                            <video id="localVideo" autoplay muted playsinline class="rounded-lg w-1/2"></video>
+                            <video id="remoteVideo" autoplay playsinline class="rounded-lg w-1/2 mt-4"></video>
+                    
+                            <button id="endCallBtn" 
+                                class="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                                End Call
+                            </button>
+                        </div>
+                    </div>
+                                       
                     <a href="#" class="add-to-favorite"><i class="fas fa-star"></i></a>
                     <a href="/"><i class="fas fa-home !text-[#354657]"></i></a>
                     <a href="#" class="show-infoSide "><i class="fas fa-info-circle !text-[#354657]"></i></a>
@@ -190,9 +215,46 @@
         {!! view('Chatify::layouts.info')->render() !!}
     </div>
 </div>
-
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const startCallBtn = document.getElementById("startCallBtn");
+        const videoModal = document.getElementById("videoCallModal");
+        const localVideo = document.getElementById("localVideo");
+        const remoteVideo = document.getElementById("remoteVideo");
+        const endCallBtn = document.getElementById("endCallBtn");
+    
+        let localStream;
+        let peerConnection;
+    
+        startCallBtn.addEventListener("click", async () => {
+            videoModal.classList.remove("hidden");
+    
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            localVideo.srcObject = localStream;
+    
+            // Create RTCPeerConnection
+            peerConnection = new RTCPeerConnection();
+            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+    
+            peerConnection.ontrack = (event) => {
+                remoteVideo.srcObject = event.streams[0];
+            };
+    
+            // TODO: Send offer via Laravel Echo / Pusher to the other user
+            // Example:
+            // Echo.private(`call.${receiverId}`).whisper('offer', { sdp: offer });
+        });
+    
+        endCallBtn.addEventListener("click", () => {
+            peerConnection.close();
+            videoModal.classList.add("hidden");
+        });
+    });
+    </script>
+    
 @include('Chatify::layouts.modals')
 @include('Chatify::layouts.footerLinks')
+
     
         
     </body>

@@ -108,10 +108,14 @@
                 <x-phosphor.icons::regular.bookmark-simple class="w-4 h-4 text-black" />
             </button>
 
-            <a href="{{ route('chatify') }}" class="px-4 py-2 bg-gray-900 text-white rounded-md flex justify-start gap-2 w-50 h-10" target="_blank" rel="noopener noreferrer">
-                Chat With Company
-                <x-phosphor.icons::regular.arrow-right class="w-4 h-4 text-white mt-1" />
-            </a>
+            <a href="{{ url('chatify', $post->user_id) }}" 
+                class="px-4 py-2 bg-gray-900 text-white rounded-md flex justify-start gap-2 w-50 h-10"
+                target="_blank" 
+                rel="noopener noreferrer">
+                 Chat With Company
+                 <x-phosphor.icons::regular.arrow-right class="w-4 h-4 text-white mt-1" />
+             </a>
+             
         </div>
     </div>
 

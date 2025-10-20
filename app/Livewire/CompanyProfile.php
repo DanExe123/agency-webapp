@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Post;
+use App\Models\User;
 
 class CompanyProfile extends Component
 {
@@ -13,8 +14,6 @@ class CompanyProfile extends Component
     {
         $this->post = $post;
     }
-
-
 
     public function render()
     {

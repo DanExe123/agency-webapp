@@ -30,6 +30,12 @@ class Post extends Model
                     ->firstOrFail();
     }
 
+    public function company()
+        {
+            return $this->belongsTo(Company::class);
+        }
+
+
 
 
 }
