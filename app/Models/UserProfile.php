@@ -27,7 +27,6 @@ class UserProfile extends Model
         'vision',
         'address',
         'phone',
-        'is_verified',
         'logo_original_name',
         'bpl_original_name',
         'dti_original_name',

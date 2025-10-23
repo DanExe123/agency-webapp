@@ -26,9 +26,6 @@ return new class extends Migration
             $table->text('vision')->nullable();
             $table->string('address')->nullable();
             $table->string('phone', 11)->unique()->nullable();
-            $table->boolean('is_verified')->default(false);
-            $table->enum('account_status', ['pending', 'verified', 'rejected'])->default('pending');
-            $table->text('rejection_feedback')->nullable();
             $table->string('logo_original_name')->nullable();
             $table->string('bpl_original_name')->nullable();
             $table->string('dti_original_name')->nullable();

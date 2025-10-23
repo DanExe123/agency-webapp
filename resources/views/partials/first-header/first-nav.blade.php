@@ -5,39 +5,55 @@
         <!-- Left -->
         <div class="flex items-center space-x-6">
             <nav class="hidden md:flex space-x-6 fixed">
-                <a wire:navigate href="{{ route('dashboard') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
+              <a wire:navigate href="{{ route('dashboard') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
                   Dashboard
-                  <!-- underline bar -->
                   <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
-                </a>
-                @hasrole('Agency')   
+              </a>
 
-            {{--   @hasrole('Company') --}}  
-                    <a wire:navigate href="{{ route('company') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
-                        Companies
-                        <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
-                    </a> 
-                    @endhasrole
-             {{--  @endhasrole  --}} 
-             @hasrole('Company') 
-          <a wire:navigate href="{{ route('create-post') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
-            Create Post
-            <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
-        </a> 
-          @endhasrole
-                @hasanyrole('Agency')    
-          <a wire:navigate href="{{ route('chatify') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
-            CHAT
-            <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
-        </a> 
-        @endhasanyrole
-        @hasanyrole('Company')    
-        <a wire:navigate href="{{ route('chatify') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
-          Agencies Messages
-          <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
-      </a> 
-      @endhasanyrole
-              </nav>              
+              @hasrole('Agency')
+                @if(Auth::user()->account_status === 'verified')
+                  <a wire:navigate href="{{ route('company') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
+                      Companies
+                      <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                  </a>
+                @else
+                    <!-- 🚫 Show disabled text or tooltip for unverified accounts -->
+                    <span class="text-gray-400 cursor-not-allowed text-sm italic">
+                        (Account not verified)
+                    </span>
+                @endif
+              @endhasrole
+
+              @hasrole('Company')
+                  @if(Auth::user()->account_status === 'verified')
+                      <!-- ✅ Show only if verified -->
+                      <a wire:navigate href="{{ route('agencies-messages') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
+                          Agencies Messages
+                          <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                      </a>
+
+                      <a wire:navigate href="{{ route('job-posting') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
+                          Job Posting
+                          <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                      </a>
+                  @else
+                      <!-- 🚫 Show disabled text or tooltip for unverified accounts -->
+                      <span class="text-gray-400 cursor-not-allowed text-sm italic">
+                          (Account not verified)
+                      </span>
+                  @endif
+              @endhasrole
+
+              @hasanyrole('Company|Agency')
+                @if(Auth::user()->account_status === 'verified')
+                  <a wire:navigate href="{{ route('chatify') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
+                      Messages
+                      <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                  </a>
+                @endif
+              @endhasanyrole
+          </nav>
+           
         </div>
   
         <!-- Right -->

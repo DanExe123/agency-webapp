@@ -103,20 +103,71 @@
             </div>
         </div>
 
-        <div class="flex justify-end gap-2">
+        <div x-data="{ openResponseModal: false }" class="flex justify-end gap-2">
             <button class="px-4 py-2 bg-gray-400 text-white rounded-md w-14 h-10">
                 <x-phosphor.icons::regular.bookmark-simple class="w-4 h-4 text-black" />
             </button>
 
+             <!-- Respond Button (Opens Modal) -->
+            @if ($this->hasApplied($post->id))
+                <button 
+                    disabled
+                    class="px-4 py-2 bg-green-600 text-white rounded-md w-32 h-10 cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                    <x-phosphor.icons::regular.check-circle class="w-5 h-5 text-white" />
+                    Applied
+                </button>
+
+            @else
+                <button 
+                    @click="openResponseModal = true"
+                    class="px-4 py-2 bg-gray-900 text-white rounded-md w-32 h-10 hover:bg-gray-700 transition"
+                >
+                    Apply
+                </button>
+            @endif
+
+
             <a href="{{ url('chatify', $post->user_id) }}" 
-                class="px-4 py-2 bg-gray-900 text-white rounded-md flex justify-start gap-2 w-50 h-10"
+                class="px-4 py-2 bg-gray-900 text-white rounded-md flex justify-start hover:bg-gray-700 gap-2 w-50 h-10"
                 target="_blank" 
                 rel="noopener noreferrer">
                  Chat With Company
                  <x-phosphor.icons::regular.arrow-right class="w-4 h-4 text-white mt-1" />
              </a>
-             
+
+            <!-- Alpine Modal -->
+            <div 
+                x-show="openResponseModal"
+                x-transition.opacity.duration.300ms
+                class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+            >
+                <div 
+                    @click.away="openResponseModal = false"
+                    x-transition.scale.duration.300ms
+                    class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative"
+                >
+                    <!-- Close Button -->
+                    <button 
+                        @click="openResponseModal = false"
+                        class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl font-bold"
+                    >
+                        &times;
+                    </button>
+
+                    <!-- Header -->
+                    <h2 class="text-xl font-bold text-gray-800 border-b pb-2">
+                        Send Proposal
+                    </h2>
+
+                    <!-- Livewire Component -->
+                    <div class="pt-4">
+                        <livewire:post-response-form :postId="$post->id" />
+                    </div>
+                </div>
+            </div>
         </div>
+
     </div>
 
     <!-- Description -->
@@ -150,7 +201,7 @@
             </div>
             <div class="py-2 flex items-center gap-2">
                 <x-phosphor.icons::bold.map-pin class="w-4 h-4 text-gray-500" />
-                <p class="text-sm text-gray-600">Location: {{ $post->location ?? 'N/A' }}</p>
+                <p class="text-sm text-gray-600">Location: {{ $post->user->profile?->address ?? 'N/A' }}</p>
             </div>
             <div class="py-2 flex items-center gap-2">
                 <x-phosphor.icons::bold.suitcase-simple class="w-4 h-4 text-gray-500" />

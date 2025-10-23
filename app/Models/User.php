@@ -28,6 +28,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'account_status',
+        'rejection_feedback'
     ];
 
     /**
@@ -80,6 +82,9 @@ class User extends Authenticatable
         return $this->hasMany(Message::class, 'receiver_id');
     }
 
-    
+    public function postResponses()
+    {
+        return $this->hasMany(PostResponse::class, 'agency_id');
+    }
 
 }

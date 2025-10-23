@@ -38,6 +38,7 @@ class CreatePost extends Component
         ]);
 
         $this->reset();
+        $this->dispatch('postCreated'); // 🔥 tell JobPosting to refresh
 
         $this->toast = [
             'type' => 'success',

@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id'); // Add this line
+            $table->unsignedBigInteger('user_id');
             $table->text('description');
             $table->text('requirements')->nullable();
             $table->string('needs');
+            $table->string('status')->default('open'); // ✅ Default status
             $table->timestamps();
         });
     }

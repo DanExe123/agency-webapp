@@ -14,6 +14,7 @@ use App\Livewire\CompanyProfile;
 use App\Livewire\ChatWithCompany;
 use App\Livewire\AgenciesMessages;
 use App\Livewire\CreatePost;
+use App\Livewire\JobPosting;
 use App\Livewire\CompanyPosted;
 use App\Livewire\MostPopular;
 
@@ -77,6 +78,7 @@ Route::middleware(['auth', 'verified', 'role:Company|Agency'])->group(function (
 Route::middleware(['auth', 'verified', 'role:Company'])->group(function () {
     Route::get('/Agencies-messages', AgenciesMessages::class)->name('agencies-messages');
     Route::get('/Create-Post', CreatePost::class)->name('create-post');
+    Route::get('/Job-posting', JobPosting::class)->name('job-posting');
 });
 
 Route::middleware(['auth'])->group(function () {

@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\UserProfile;
+use App\Models\User;
 
 class AdminDashboard extends Component
 {
@@ -11,13 +12,13 @@ class AdminDashboard extends Component
     public $selectedProfile = null;
     public $showModal = false;
 
-    public $rejectProfileId = null;
+    public $rejectUserId = null;
     public $rejectFeedback = '';
     public $showRejectModal = false;
 
     public function mount()
     {
-        // Fetch all profiles with related user
+        // Fetch all profiles with their user (who now has account_status)
         $this->profiles = UserProfile::with('user')->get();
     }
 
@@ -33,9 +34,9 @@ class AdminDashboard extends Component
         $this->selectedProfile = null;
     }
 
-    public function openRejectModal($profileId)
+    public function openRejectModal($userId)
     {
-        $this->rejectProfileId = $profileId;
+        $this->rejectUserId = $userId;
         $this->rejectFeedback = '';
         $this->showRejectModal = true;
     }
@@ -43,19 +44,21 @@ class AdminDashboard extends Component
     public function closeRejectModal()
     {
         $this->showRejectModal = false;
-        $this->rejectProfileId = null;
+        $this->rejectUserId = null;
         $this->rejectFeedback = '';
     }
 
-    public function approve($profileId)
+    public function approve($userId)
     {
-        $profile = UserProfile::find($profileId);
-        $profile->account_status = 'verified';
-        $profile->rejection_feedback = null; // clear old feedback
-        $profile->save();
+        $user = User::find($userId);
+        if ($user) {
+            $user->account_status = 'verified';
+            $user->rejection_feedback = null;
+            $user->save();
 
-        session()->flash('message', 'Profile approved successfully.');
-        $this->mount();
+            session()->flash('message', 'User account approved successfully.');
+            $this->mount();
+        }
     }
 
     public function reject()
@@ -64,18 +67,19 @@ class AdminDashboard extends Component
             'rejectFeedback' => 'required|string|max:500',
         ]);
 
-        if ($this->rejectProfileId) {
-            $profile = UserProfile::find($this->rejectProfileId);
-            $profile->account_status = 'rejected';
-            $profile->rejection_feedback = $this->rejectFeedback; // ✅ consistent
-            $profile->save();
+        if ($this->rejectUserId) {
+            $user = User::find($this->rejectUserId);
+            if ($user) {
+                $user->account_status = 'rejected';
+                $user->rejection_feedback = $this->rejectFeedback;
+                $user->save();
 
-            session()->flash('message', 'Profile rejected with feedback.');
-            $this->closeRejectModal();
-            $this->mount();
+                session()->flash('message', 'User account rejected with feedback.');
+                $this->closeRejectModal();
+                $this->mount();
+            }
         }
     }
-
 
     public function render()
     {

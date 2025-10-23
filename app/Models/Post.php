@@ -15,6 +15,7 @@ class Post extends Model
         'description',
         'requirements',
         'needs',
+        'status',
     
     ];
 
@@ -35,7 +36,9 @@ class Post extends Model
             return $this->belongsTo(Company::class);
         }
 
-
-
+    public function responses()
+    {
+        return $this->hasMany(PostResponse::class);
+    }
 
 }
