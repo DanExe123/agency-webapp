@@ -17,6 +17,7 @@ use App\Livewire\CreatePost;
 use App\Livewire\JobPosting;
 use App\Livewire\CompanyPosted;
 use App\Livewire\MostPopular;
+use App\Livewire\PostApplied;
 
 
 
@@ -71,6 +72,7 @@ Route::middleware(['auth', 'verified', 'role:Company|Agency'])->group(function (
     Route::get('/Agencies-messages', AgenciesMessages::class)->name('agencies-messages');
     Route::get('/posted', CompanyPosted::class)->name('company-posted');
     Route::get('/Most-popular', MostPopular::class)->name('most-popular');
+    Route::get('/Post-applied', PostApplied::class)->name('post-applied');
 
 });
 

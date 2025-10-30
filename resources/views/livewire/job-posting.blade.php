@@ -46,7 +46,7 @@
     </div>
 </header>
 
-   <div x-data="{ openModal: false }" class="max-w-7xl mx-auto mt-8 px-6">
+    <div x-data="{ openModal: false }" class="max-w-7xl mx-auto mt-8 px-6">
         <!-- Top Controls -->
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
             <div class="flex flex-wrap items-center gap-3">
@@ -118,11 +118,11 @@
             x-show="open" 
             x-transition 
             class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-        >
+            >
             <div 
                 @click.away="open = false; @this.showResponsesModal = false"
                 class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative"
-            >
+                >
                 <button 
                     @click="open = false; @this.showResponsesModal = false"
                     class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl font-bold"
@@ -138,15 +138,50 @@
                     @if(count($selectedPostResponses))
                         @foreach($selectedPostResponses as $response)
                             <div class="border p-3 rounded-md">
-                                <p><span class="font-semibold">Agency:</span> {{ $response['agency']['name'] ?? 'N/A' }}</p>
-                                <p><span class="font-semibold">Message:</span> {{ $response['message'] }}</p>
-                                <p><span class="font-semibold">Proposed Rate:</span> {{ $response['proposed_rate'] }}</p>
-                                <p><span class="font-semibold">Status:</span> {{ ucfirst($response['status']) }}</p>
-                                @if($response['remarks'])
-                                    <p><span class="font-semibold">Remarks:</span> {{ $response['remarks'] }}</p>
+                                <div class="flex items-center gap-2">
+                                <img 
+                                    src="{{ asset('storage/' . ($response->agency->profile->logo_path ?? 'images/default-logo.png')) }}" 
+                                    alt="Logo" 
+                                    class="w-8 h-8 rounded-full object-cover border"
+                                >
+                                <span class="font-semibold">{{ $response->agency->name ?? 'N/A' }}</span>
+                            </div>
+                                <p><span class="font-semibold">Message:</span> {{ $response->message }}</p>
+                                
+                                <!-- Display Proposed Rates by Guard Type -->
+                                <div class="mt-3">
+                                    <p class="font-semibold text-gray-800 mb-2">Proposed Rates per Guard Type:</p>
+                                    @if($response->proposedRates->count())
+                                        <table class="w-full text-xs border border-gray-200 rounded-lg overflow-hidden">
+                                            <thead class="bg-gray-100 text-gray-700">
+                                                <tr>
+                                                    <th class="px-3 py-2 text-left font-medium">Guard Type</th>
+                                                    <th class="px-3 py-2 text-left font-medium">Proposed Rate (₱)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-gray-200">
+                                                @foreach($response->proposedRates as $rate)
+                                                    <tr>
+                                                        <td class="px-3 py-2 text-gray-800">{{ $rate->guardType->name ?? 'Unknown' }}</td>
+                                                        <td class="px-3 py-2 text-gray-600">₱{{ number_format($rate->proposed_rate, 2) }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    @else
+                                        <p class="text-gray-400 text-xs">No rates provided.</p>
+                                    @endif
+                                </div>
+
+
+                                <p class="mt-2"><span class="font-semibold">Status:</span> {{ ucfirst($response->status) }}</p>
+
+                                @if($response->remarks)
+                                    <p><span class="font-semibold">Remarks:</span> {{ $response->remarks }}</p>
                                 @endif
                             </div>
                         @endforeach
+
                     @else
                         <p class="text-gray-500 text-center">No proposals yet.</p>
                     @endif
@@ -154,86 +189,158 @@
             </div>
         </div>
 
-
-
         <!-- Job Posts Table -->
-        <div class="bg-white shadow rounded-lg overflow-hidden mt-8">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Description</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Requirements</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Needs</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Posted</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-center text-gray-600 uppercase">Response</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    @forelse ($posts as $post)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 text-sm text-gray-800">{{ $post->description }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600">{{ $post->requirements ?: '—' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600">{{ $post->needs }}</td>
-                            <td class="px-6 py-4">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                    {{ $post->status == 'open' ? 'bg-green-100 text-green-800' : 
-                                    ($post->status == 'proposed' ? 'bg-blue-100 text-blue-800' : 
-                                    'bg-gray-100 text-gray-800') }}">
-                                    {{ ucfirst($post->status ?? 'open') }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-500">
-                                {{ $post->created_at->diffForHumans() }}
-                            </td>
-                            <td class="px-6 py-4 text-sm text-center text-gray-800">{{ $post->responses->count() }}</td>
-
-                            <td class="px-6 py-4 text-sm text-gray-600 flex items-center gap-2">
-                                <!-- View Proposals -->
-                                <button 
-                                    wire:click="viewProposals({{ $post->id }})"
-                                    class="text-indigo-600 hover:text-indigo-800 text-xs font-medium">
-                                    View Proposals
-                                </button>
-
-
-                                <!-- Edit -->
-                                <button 
-                                    wire:click="editPost({{ $post->id }})" 
-                                    class="text-blue-600 hover:text-blue-800 text-xs font-medium">
-                                    Edit
-                                </button>
-
-                                <!-- Close -->
-                                @if($post->status !== 'closed')
-                                    <button 
-                                        wire:click="closePost({{ $post->id }})" 
-                                        class="text-yellow-600 hover:text-yellow-800 text-xs font-medium">
-                                        Close
-                                    </button>
-                                @endif
-
-                                <!-- Delete -->
-                                <button 
-                                    wire:click="deletePost({{ $post->id }})" 
-                                    onclick="return confirm('Are you sure you want to delete this post?')"
-                                    class="text-red-600 hover:text-red-800 text-xs font-medium">
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>
-                    @empty
+        @if(!$showEvaluation)
+            <div class="bg-white shadow rounded-lg overflow-hidden mt-8">
+                <table class="min-w-full divide-y divide-gray-200 mb-24">
+                    <thead class="bg-gray-100">
                         <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">No job posts yet.</td>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Description</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Requirements</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Needs</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Posted</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-center text-gray-600 uppercase">Response</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Actions</th>
                         </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        @foreach ($posts as $post)
+                            <tr class="hover:bg-gray-50 relative" x-data="{ open: false }" @click.outside="open = false">
+                                <td class="px-6 py-4 text-sm text-gray-800">{{ $post->description }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-600">{{ $post->requirements ?: '—' }}</td>
 
-            
-        </div>
+                                <!-- Needs column -->
+                                <td class="px-6 py-4 text-sm text-gray-600 relative">
+                                    @php
+                                        $totalNeeds = $post->guardNeeds->sum('quantity');
+                                    @endphp
+                                    <button 
+                                        @click="open = !open"
+                                        class="text-indigo-600 hover:text-indigo-800 underline">
+                                        {{ $totalNeeds }} guards
+                                    </button>
+
+                                    <!-- Dropdown -->
+                                    <div 
+                                        x-show="open"
+                                        x-transition
+                                        class="absolute z-20 bg-white border border-gray-300 shadow-lg rounded-lg p-3 mt-1 w-56"
+                                        @click.outside="open = false"
+                                    >
+                                        <p class="font-semibold text-gray-700 mb-2">Guard Type Details</p>
+                                        @foreach ($post->guardNeeds as $need)
+                                            <div class="flex justify-between text-sm text-gray-700">
+                                                <span>{{ $need->guardType->name }}</span>
+                                                <span>{{ $need->quantity }}</span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </td>
+
+                                <td class="px-6 py-4">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                        {{ $post->status == 'open' ? 'bg-green-100 text-green-800' : 
+                                        ($post->status == 'proposed' ? 'bg-blue-100 text-blue-800' : 
+                                        'bg-gray-100 text-gray-800') }}">
+                                        {{ ucfirst($post->status ?? 'open') }}
+                                    </span>
+                                </td>
+
+                                <td class="px-6 py-4 text-sm text-gray-500">
+                                    {{ $post->created_at->diffForHumans() }}
+                                </td>
+
+                                <td class="px-6 py-4 text-sm text-center text-gray-800">{{ $post->responses->count() }}</td>
+
+                                <td class="px-6 py-4 text-sm text-gray-600 flex items-center gap-2">
+                                    <button 
+                                        wire:click="viewProposals({{ $post->id }})"
+                                        class="text-indigo-600 hover:text-indigo-800 text-xs font-medium">
+                                        View Proposals
+                                    </button>
+
+                                    <button 
+                                        wire:click="evaluateProposals({{ $post->id }})"
+                                        class="text-green-600 hover:text-green-800 text-xs font-medium">
+                                        Evaluate Proposals
+                                    </button>
+
+                                    <div x-data="{ open: false }" class="relative">
+                                        <button 
+                                            @click="open = !open"
+                                            class="p-1 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" 
+                                                class="w-5 h-5" 
+                                                fill="none" 
+                                                viewBox="0 0 24 24" 
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                    d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zm0 6a.75.75 0 110-1.5.75.75 0 010 1.5zm0 6a.75.75 0 110-1.5.75.75 0 010 1.5z" />
+                                            </svg>
+                                        </button>
+
+                                        <div 
+                                            x-show="open"
+                                            @click.away="open = false"
+                                            x-transition
+                                            class="absolute right-0 mt-2 w-36 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+                                            >
+                                            <ul class="text-xs text-gray-700 divide-y divide-gray-100">
+                                                <li>
+                                                    <button 
+                                                        wire:click="editPost({{ $post->id }})"
+                                                        class="w-full text-left px-4 py-2 hover:bg-gray-100 text-blue-600"
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                </li>
+
+                                                <li>
+                                                    @if($post->status === 'closed')
+                                                        <button 
+                                                            wire:click="togglePostStatus({{ $post->id }})"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100 text-green-600"
+                                                        >
+                                                            Open
+                                                        </button>
+                                                    @else
+                                                        <button 
+                                                            wire:click="togglePostStatus({{ $post->id }})"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100 text-yellow-600"
+                                                        >
+                                                            Close
+                                                        </button>
+                                                    @endif
+                                                </li>
+
+                                                <li>
+                                                    <button 
+                                                        wire:click="deletePost({{ $post->id }})"
+                                                        onclick="return confirm('Are you sure you want to delete this post?')"
+                                                        class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                
+                            </tr>
+                        @endforeach
+                    </tbody>
+
+                </table>
+
+                
+            </div>
+
+        @else
+            <livewire:evaluate-proposals :postId="$selectedPost->id" />
+        @endif
     </div>
-
 
 </div>

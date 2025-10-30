@@ -13,7 +13,6 @@ class PostResponse extends Model
         'post_id',
         'agency_id',
         'message',
-        'proposed_rate',
         'status',
         'chat_id',
         'remarks',
@@ -27,5 +26,10 @@ class PostResponse extends Model
     public function agency()
     {
         return $this->belongsTo(User::class, 'agency_id');
+    }
+
+    public function proposedRates()
+    {
+        return $this->hasMany(PostResponseRate::class);
     }
 }

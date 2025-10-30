@@ -11,21 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('post_guard_needs', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->text('description');
-            $table->text('requirements')->nullable();
-            $table->string('status')->default('open'); // ✅ Default status
+            $table->foreignId('post_id')->constrained('posts')->onDelete('cascade');
+            $table->foreignId('guard_type_id')->constrained('security_guard_types')->onDelete('cascade');
+            $table->integer('quantity')->default(1);
             $table->timestamps();
         });
     }
-
+    
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('post_guard_needs');
     }
 };

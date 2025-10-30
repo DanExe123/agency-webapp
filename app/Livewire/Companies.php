@@ -9,10 +9,9 @@ class Companies extends Component
 {
     public $posts; // if you want to display a list of posts
 
-     public function mount()
+    public function mount()
     {
-        // Eager load both 'user' and 'user.profile'
-        $this->posts = Post::with('user.profile')->get();
+        $this->posts = Post::with(['user.profile', 'guardNeeds.guardType'])->get();
     }
     /**
      * Redirect to the company profile page for a specific post.

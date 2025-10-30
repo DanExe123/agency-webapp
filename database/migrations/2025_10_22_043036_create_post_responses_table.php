@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('post_id')->constrained()->onDelete('cascade');
             $table->foreignId('agency_id')->constrained('users')->onDelete('cascade');
             $table->text('message')->nullable();
-            $table->decimal('proposed_rate', 10, 2)->nullable();
-            $table->enum('status', ['pending', 'accepted', 'rejected', 'negotiating', 'closed'])->default('pending');
+            //$table->decimal('proposed_rate', 10, 2)->nullable();
+            $table->enum('status', ['pending', 'accepted', 'rejected','not_selected', 'negotiating', 'closed'])->default('pending');
             $table->string('chat_id')->nullable(); // Optional link to Chatify
             $table->text('remarks')->nullable();
             $table->timestamps();

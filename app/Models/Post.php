@@ -14,9 +14,7 @@ class Post extends Model
         'user_id',
         'description',
         'requirements',
-        'needs',
         'status',
-    
     ];
 
     public function user()
@@ -40,5 +38,11 @@ class Post extends Model
     {
         return $this->hasMany(PostResponse::class);
     }
+
+    public function guardNeeds()
+    {
+        return $this->hasMany(PostGuardNeed::class)->with('guardType');
+    }
+
 
 }

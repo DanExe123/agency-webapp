@@ -170,11 +170,28 @@
 
     </div>
 
-    <!-- Description -->
-    <div class="mt-4">
-        <h3 class="text-xl font-semibold text-gray-700">Company Description</h3>
-        <p class="text-sm text-gray-600 mt-2">{{ $post->description ?? 'No description provided.' }}</p>
+    <div class="mt-2 flex flex-wrap items-start gap-6 text-sm text-gray-700">
+        <!-- Company Description -->
+        <div class="min-w-[250px]">
+            <h3 class="text-xl font-semibold text-gray-700">Company Description</h3>
+            <p class="text-sm text-gray-600 mt-2">{{ $post->description ?? 'No description provided.' }}</p>
+        </div>
+
+        <!-- Guard Needs -->
+        <div class="min-w-[250px]">
+            <p class="font-semibold mb-2">Guard Needs:</p>
+            <div class="flex flex-wrap gap-2">
+                @forelse ($post->guardNeeds as $need)
+                    <span class="bg-gray-200/60 text-gray-700 px-3 py-1 rounded-full text-xs font-medium">
+                        {{ $need->guardType->name }} — {{ $need->quantity }}
+                    </span>
+                @empty
+                    <p class="text-gray-400 text-xs">No guard needs specified</p>
+                @endforelse
+            </div>
+        </div>
     </div>
+
 
     <!-- Requirements -->
     <div class="mt-6">
@@ -189,6 +206,7 @@
             @endif
         </ul>
     </div>
+
 
     <!-- Overview -->
     <div class="mt-6 grid grid-cols-2 gap-4">

@@ -150,6 +150,18 @@
                             </span>
                         </p>
                     </div>
+                    <div class="text-sm text-gray-700">
+                        <div class="flex flex-wrap gap-2">
+                            @forelse ($post->guardNeeds as $need)
+                                <span class="bg-gray-200/60 text-gray-700 px-3 py-1 rounded-full text-xs font-medium">
+                                    {{ $need->guardType->name }} — {{ $need->quantity }}
+                                </span>
+                            @empty
+                                <p class="text-gray-400 text-xs">No guard needs specified</p>
+                            @endforelse
+                        </div>
+                    </div>
+
                 </div>
         
                 <!-- Right -->

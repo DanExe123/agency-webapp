@@ -16,6 +16,10 @@
                       Companies
                       <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
                   </a>
+                  <a wire:navigate href="{{ route('post-applied') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
+                      Post Applied
+                      <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                  </a>
                 @else
                     <!-- 🚫 Show disabled text or tooltip for unverified accounts -->
                     <span class="text-gray-400 cursor-not-allowed text-sm italic">
@@ -26,12 +30,6 @@
 
               @hasrole('Company')
                   @if(Auth::user()->account_status === 'verified')
-                      <!-- ✅ Show only if verified -->
-                      <a wire:navigate href="{{ route('agencies-messages') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
-                          Agencies Messages
-                          <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
-                      </a>
-
                       <a wire:navigate href="{{ route('job-posting') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
                           Job Posting
                           <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>

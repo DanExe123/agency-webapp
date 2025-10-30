@@ -29,7 +29,8 @@ class User extends Authenticatable
         'email',
         'password',
         'account_status',
-        'rejection_feedback'
+        'rejection_feedback',
+        'rating'
     ];
 
     /**
