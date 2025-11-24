@@ -6,7 +6,7 @@
         <div class="flex items-center space-x-6">
             <nav class="hidden md:flex space-x-6 fixed">
               <a wire:navigate href="{{ route('dashboard') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
-                  Dashboard
+                  Home
                   <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
               </a>
 
@@ -55,19 +55,35 @@
         </div>
   
         <!-- Right -->
-        <div class="hidden md:flex items-center space-x-6">
-            <x-phosphor.icons::regular.phone-call class="w-6 h-6 text-gray-500" />
-            <span class="text-gray-700 font-semibold">63+ 9*********</span>
+         <div class="hidden md:flex items-center space-x-6">
+                <x-phosphor.icons::regular.phone-call class="w-6 h-6 text-gray-500" />
+                <span class="text-gray-700 font-semibold">63+ 9*********</span>
 
-   <!-- Language Selector (Only English with US flag) -->
-<div class="relative">
-  <button 
-    class="flex items-center px-4 py-2  rounded-md hover:bg-gray-100"
-  >
-    <img src="/us.png" alt="US Flag" class="w-5 h-3 mr-2">
-    <span>English</span>
-  </button>
-</div>
+                <!-- Language Selector -->
+                <div class="relative">
+                    <button class="flex items-center px-4 py-2 rounded-md hover:bg-gray-100">
+                        <img src="/us.png" alt="US Flag" class="w-5 h-3 mr-2">
+                        <span>English</span>
+                    </button>
+                </div>
+
+                <!-- Livewire Profile Dropdown -->
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" class="flex items-center space-x-2 rounded-md hover:bg-gray-100 px-3 py-2">
+                        @if(Auth::user()->profile && Auth::user()->profile->logo_path)
+                            <img src="{{ asset('storage/' . Auth::user()->profile->logo_path) }}" alt="Profile" class="w-8 h-8 rounded-full object-cover">
+                        @else
+                            <img src="https://via.placeholder.com/40" alt="Profile" class="w-8 h-8 rounded-full object-cover">
+                        @endif
+                        <span class="font-semibold text-gray-700">{{ Auth::user()->name }}</span>
+                    </button>
+
+                    <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-50">
+                        
+                    </div>
+                </div>
+
+            </div>
 
         </div>
   

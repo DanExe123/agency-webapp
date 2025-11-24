@@ -44,12 +44,20 @@
     @include('partials.first-section')
 
     <!-- Most Popular Agencies Section -->
-    @include('partials.second-section')
+    @role('Company')
+      @include('partials.second-section')
+    @endrole
+
     @include('partials.third-section')
 
+    @role('Agency')
     <!-- Company post Section -->
-    @include('partials.fourth-section')
-    @include('partials.fifth-section')
+      @include('partials.fourth-section')
+    @endrole
+
+    @role('Company')
+      @include('partials.fifth-section')
+    @endrole
 
     <!-- Footer Section -->
     @include('partials.footer')

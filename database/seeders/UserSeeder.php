@@ -108,7 +108,7 @@ class UserSeeder extends Seeder
                 [
                     'name'           => $data['name'],
                     'password'       => bcrypt('password'),
-                    'account_status' => 'pending',
+                    'account_status' => 'verified',
                 ]
             );
             $agency->assignRole('Agency');

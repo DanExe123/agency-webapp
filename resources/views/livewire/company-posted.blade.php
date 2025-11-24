@@ -3,16 +3,33 @@
         <div class="group bg-white p-6 rounded-lg shadow-lg border border-transparent transition ease-in-out duration-300 hover:border-black hover:shadow-xl">
             <div class="flex items-center space-x-4">
                 <div class="w-12 h-12 bg-white flex items-center justify-center rounded-md overflow-hidden">
-                    <img src="{{ $post->logo ?? 'https://via.placeholder.com/40' }}" alt="{{ $post->company_name }}" class="w-8 h-8">
+                     @if($post->user->profile && $post->user->profile->logo_path)
+                        <img src="{{ asset('storage/'.$post->user->profile->logo_path) }}" class="w-10 h-10 object-cover rounded-full" />
+                    @else
+                        <img src="https://via.placeholder.com/40" class="w-10 h-10" />
+                    @endif
+
                 </div>
                 <div class="text-sm text-gray-700 group-hover:text-gray-900 transition duration-300">
-                    <p class="font-medium">{{ $post->company_name }}</p>
+                    <p class="font-medium">
+                        {{ $post->user->name }}
+                    </p>
+
+                    <!-- Address -->
                     <div class="flex justify-start gap-2">
                         <x-phosphor.icons::regular.map-pin class="w-4 h-4 text-gray-400" />
-                        <p class="text-xs">{{ $post->location }}</p>
+                        <p class="text-xs">
+                            {{ $post->user->profile->address ?? 'No address provided' }}
+                        </p>
                     </div>
                 </div>
             </div>
+            <div class="mt-3">
+                <p class="text-sm text-gray-600">
+                    {{ Str::limit($post->description, 30, '...') }}
+                </p>
+            </div>
+
 
             @auth
             <!-- Only authenticated users see the link -->

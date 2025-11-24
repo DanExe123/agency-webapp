@@ -88,4 +88,23 @@ class User extends Authenticatable
         return $this->hasMany(PostResponse::class, 'agency_id');
     }
 
+    // Relation to Feedback received
+    public function feedbacksReceived()
+    {
+        return $this->hasMany(Feedback::class, 'receiver_id');
+    }
+
+    // Function to get average rating
+    public function averageRating()
+    {
+        return round($this->feedbacksReceived()->avg('rating') ?? 0, 2);
+    }
+
+    // Function to get total feedback count
+    public function feedbackCount()
+    {
+        return $this->feedbacksReceived()->count();
+    }
+    
+
 }

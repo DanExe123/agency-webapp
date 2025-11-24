@@ -12,7 +12,9 @@ class CompanyPosted extends Component
 
     public function mount()
     {
-        $this->posts = Post::orderBy('created_at', 'desc')->get();
+        $this->posts = Post::where('status', '!=', 'completed')
+        ->orderBy('created_at', 'desc')
+        ->get();
     }
 
     public function togglePost($postId)

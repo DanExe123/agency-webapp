@@ -48,7 +48,7 @@
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.285a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.285c.3.922-.755 1.688-1.54 1.118L10 13.347l-2.893 2.02c-.784.57-1.838-.196-1.54-1.118l1.07-3.285a1 1 0 00-.364-1.118L3.47 8.712c-.783-.57-.38-1.81.588-1.81h3.462a1 1 0 00.95-.69l1.079-3.285z"/>
                             </svg>
 
-                            <span>{{ number_format($response->agency->rating ?? 0, 1) }}</span>
+                            <span>{{ number_format($response->agency->averageRating() ?? 0, 1) }}</span>
                         </td>
 
 
@@ -125,7 +125,7 @@
                 Select Agency
             </button>
         @endif
-    </div>
+    </div>                  
 
     <!-- DSS Modal -->
     <div x-data="{ open: @entangle('showDssModal') }" x-show="open"
