@@ -268,7 +268,7 @@
                                             @endphp
 
                                             @if($negotiating)
-                                                <div class="flex items-center gap-2">
+                                                <a href="{{ route('profile.visit', $negotiating->agency_id) }}" wire:navigate class="flex items-center gap-2">
                                                     @if($negotiating->agency && $negotiating->agency->profile)
                                                         <img 
                                                             src="{{ asset('storage/' . $negotiating->agency->profile->logo_path) }}"
@@ -277,7 +277,7 @@
                                                         >
                                                     @endif
                                                     <span>{{ $negotiating->agency->name ?? 'Unknown Agency' }}</span>
-                                                </div>
+                                                </a>
 
                                                 <!-- CHAT BUTTON -->
                                                 <a 
@@ -288,6 +288,7 @@
                                                 >
                                                     Chat
                                                 </a>
+                                                
                                             @else
                                                 <span class="text-gray-400">—</span>
                                             @endif
@@ -380,6 +381,9 @@
                             @endforeach
                         </tbody>
                     </table>
+                    <div class="mt-6 p-6">
+                        {{ $posts->links() }}
+                    </div>
                 </div>
             </div>
 

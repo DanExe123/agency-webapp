@@ -130,6 +130,10 @@
             </tbody>
         </table>
 
+        <div class="mt-4 p-6">
+            {{ $responses->links() }} <!-- pagination links -->
+        </div>
+
     </div>
 </div>
 

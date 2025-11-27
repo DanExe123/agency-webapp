@@ -56,32 +56,45 @@
   
         <!-- Right -->
          <div class="hidden md:flex items-center space-x-6">
-                <x-phosphor.icons::regular.phone-call class="w-6 h-6 text-gray-500" />
-                <span class="text-gray-700 font-semibold">63+ 9*********</span>
+                @auth
+                    <!-- Livewire Profile Dropdown -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" class="flex items-center space-x-2 rounded-md hover:bg-gray-100 px-3 py-2">
+                            @if(Auth::user()->profile && Auth::user()->profile->logo_path)
+                                <img src="{{ asset('storage/' . Auth::user()->profile->logo_path) }}" alt="Profile" class="w-8 h-8 rounded-full object-cover">
+                            @else
+                                <img src="https://via.placeholder.com/40" alt="Profile" class="w-8 h-8 rounded-full object-cover">
+                            @endif
+                            <span class="font-semibold text-gray-700">{{ Auth::user()->name }}</span>
+                        </button>
 
-                <!-- Language Selector -->
-                <div class="relative">
-                    <button class="flex items-center px-4 py-2 rounded-md hover:bg-gray-100">
-                        <img src="/us.png" alt="US Flag" class="w-5 h-3 mr-2">
-                        <span>English</span>
-                    </button>
-                </div>
+                        <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-50">
+                            <!-- Profile Link -->
+                            <a wire:navigate href="{{ route('settings.profile') }}" class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-black transition-colors duration-150">
+                                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A7 7 0 0112 15a7 7 0 016.879 2.804M12 7a4 4 0 100 8 4 4 0 000-8z" />
+                                </svg>
+                                Profile
+                            </a>
 
-                <!-- Livewire Profile Dropdown -->
-                <div class="relative" x-data="{ open: false }">
-                    <button @click="open = !open" class="flex items-center space-x-2 rounded-md hover:bg-gray-100 px-3 py-2">
-                        @if(Auth::user()->profile && Auth::user()->profile->logo_path)
-                            <img src="{{ asset('storage/' . Auth::user()->profile->logo_path) }}" alt="Profile" class="w-8 h-8 rounded-full object-cover">
-                        @else
-                            <img src="https://via.placeholder.com/40" alt="Profile" class="w-8 h-8 rounded-full object-cover">
-                        @endif
-                        <span class="font-semibold text-gray-700">{{ Auth::user()->name }}</span>
-                    </button>
+                            <!-- Divider -->
+                            <div class="border-t my-1"></div>
 
-                    <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-50">
-                        
+                            <!-- Logout Form -->
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="flex items-center gap-2 w-full px-4 py-2 text-sm font-medium text-white bg-black rounded-md hover:bg-gray-100 hover:text-black transition-colors duration-150">
+                                    <svg class="w-5 h-5 text-white group-hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-8V7" />
+                                    </svg>
+                                    Log Out
+                                </button>
+                            </form>
+                        </div>
+
                     </div>
-                </div>
+                @endauth
+
 
             </div>
 

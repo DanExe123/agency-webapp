@@ -12,7 +12,7 @@ class CompanyPosted extends Component
 
     public function mount()
     {
-        $this->posts = Post::where('status', '!=', 'completed')
+        $this->posts = Post::where('status', 'open') // only open posts
         ->orderBy('created_at', 'desc')
         ->get();
     }

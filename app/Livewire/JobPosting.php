@@ -5,14 +5,16 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\Post;
 use Illuminate\Support\Facades\Auth;
+use Livewire\WithPagination;
 
 class JobPosting extends Component
 {
+    use WithPagination;
+
     public $search = '';
     public $statusFilter = '';
-    public $posts = [];
 
-     // For the modal
+    // For the modal
     public $selectedPostResponses = [];
     
     public $showResponsesModal = false;
@@ -20,9 +22,8 @@ class JobPosting extends Component
     public $showEvaluation = false;
     public $selectedPost = null;
 
-
     protected $listeners = [
-        'postCreated' => 'fetchPosts',
+        'postCreated' => '$refresh', // refresh automatically
         'backToList' => 'backToList',
     ];
 
@@ -38,7 +39,6 @@ class JobPosting extends Component
         $this->selectedPost = null;
     }
 
-
     public function viewProposals($postId)
     {
         $post = Post::with([
@@ -53,19 +53,14 @@ class JobPosting extends Component
         }
     }
 
-    public function mount()
-    {
-        $this->fetchPosts();
-    }
-
     public function updatedSearch()
     {
-        $this->fetchPosts();
+        $this->resetPage(); // reset pagination when searching
     }
 
     public function updatedStatusFilter()
     {
-        $this->fetchPosts();
+        $this->resetPage(); // reset pagination when filtering
     }
 
     public function togglePostStatus($id)
@@ -77,7 +72,7 @@ class JobPosting extends Component
         if ($post) {
             $newStatus = $post->status === 'closed' ? 'open' : 'closed';
             $post->update(['status' => $newStatus]);
-            $this->fetchPosts(); // refresh the list
+            // no need to fetchPosts(), pagination will reload
         }
     }
 
@@ -87,7 +82,7 @@ class JobPosting extends Component
 
         if ($post) {
             $post->delete();
-            $this->fetchPosts();
+            // no need to fetchPosts(), pagination will reload
         }
     }
 
@@ -101,7 +96,10 @@ class JobPosting extends Component
         $this->expandedPostId = $this->expandedPostId === $postId ? null : $postId;
     }
 
-    public function fetchPosts()
+    /**
+     * Fetch query builder for posts
+     */
+    public function fetchQuery()
     {
         $query = Post::with(['guardNeeds.guardType', 'responses'])
             ->where('user_id', Auth::id());
@@ -114,13 +112,13 @@ class JobPosting extends Component
             $query->where('status', $this->statusFilter);
         }
 
-        $this->posts = $query->latest()->get();
+        return $query->latest();
     }
 
     public function render()
     {
         return view('livewire.job-posting', [
-            'posts' => $this->posts,
+            'posts' => $this->fetchQuery()->paginate(6), // paginate here, not in public property
         ]);
     }
 }

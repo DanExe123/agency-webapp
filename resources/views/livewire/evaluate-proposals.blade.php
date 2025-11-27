@@ -32,14 +32,14 @@
                 @forelse($post->responses as $response)
                     <tr class="border-t hover:bg-gray-50 align-top">
                         <td class="px-4 py-2 font-medium align-top">
-                            <div class="flex items-center gap-2">
+                            <a href="{{ route('profile.visit', $response->agency->id) }}" wire:navigate class="flex items-center gap-2">
                                 <img 
                                     src="{{ asset('storage/' . ($response->agency->profile->logo_path ?? 'images/default-logo.png')) }}" 
                                     alt="Logo" 
                                     class="w-8 h-8 rounded-full object-cover border"
                                 >
                                 <span>{{ $response->agency->name ?? 'N/A' }}</span>
-                            </div>
+                            </a>
                         </td>
 
                         <td class="px-4 py-2 text-center font-medium align-top flex items-center justify-center gap-2">

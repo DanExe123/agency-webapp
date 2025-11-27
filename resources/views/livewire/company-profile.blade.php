@@ -60,18 +60,14 @@
     <div class="flex justify-between items-center py-8">
         <div class="flex items-start gap-4">
             <!-- Logo -->
-            <img src="{{ $post->user->profile?->logo_path ? asset('storage/' . $post->user->profile->logo_path) : 'https://via.placeholder.com/80' }}" 
+            <a href="{{ route('profile.visit', $post->user->id) }}" wire:navigate><img src="{{ $post->user->profile?->logo_path ? asset('storage/' . $post->user->profile->logo_path) : 'https://via.placeholder.com/80' }}" 
                  alt="{{ $post->user->profile?->organization_type ?? $post->user->name }}" 
-                 class="w-20 h-20 rounded-full bg-gray-700 object-cover">
+                 class="w-20 h-20 rounded-full bg-gray-700 object-cover"></a>
 
             <div class="flex flex-col">
-                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <a href="{{ route('profile.visit', $post->user->id) }}" wire:navigate class="text-2xl font-bold text-gray-800 flex items-center gap-2">
                     {{ $post->user->name ?? 'N/A' }}
-                   
-                        <span class="text-xs font-medium text-red-600 bg-red-50 py-1 px-3 rounded-full">Featured</span>
-                    
-                    <span class="text-xs font-medium text-gray-800 bg-gray-400 py-1 px-3 rounded-full">{{ $post->job_type }} Full Time</span>
-                </h2>
+                </a>
 
                 <!-- Links Row -->
                 <div class="flex flex-wrap items-center gap-4 mt-2">

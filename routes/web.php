@@ -33,6 +33,8 @@ use App\Livewire\AdminDashboard;
 use App\Http\Controllers\DownloadController;
 
 
+use App\Livewire\ProfileVisit;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -73,6 +75,8 @@ Route::middleware(['auth', 'verified', 'role:Company|Agency'])->group(function (
     Route::get('/posted', CompanyPosted::class)->name('company-posted');
     Route::get('/Most-popular', MostPopular::class)->name('most-popular');
     Route::get('/Post-applied', PostApplied::class)->name('post-applied');
+    Route::get('/profile/{user}', ProfileVisit::class)
+    ->name('profile.visit');
 
 });
 
