@@ -56,9 +56,7 @@
         </div>
 
         <div class="flex justify-end gap-2">
-            <button class="px-4 py-2 bg-gray-400 text-white rounded-md w-14 h-10">
-                <x-phosphor.icons::regular.bookmark-simple class="w-4 h-4 text-black" />
-            </button>
+           
 
              <!-- Respond Button (Opens Modal) -->
             @if ($this->hasApplied($post->id))

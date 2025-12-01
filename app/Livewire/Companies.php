@@ -23,6 +23,11 @@ class Companies extends Component
             ->toArray();
     }
 
+     public function goToCompanyProfile($postId)
+    {
+        return redirect()->route('company-profile', ['post' => $postId]);
+    }
+
     public function applySearch()
     {
         // ✅ Ensure array format
