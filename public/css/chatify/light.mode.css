@@ -1,3 +1,8 @@
+lightmode css .messenger-listView {
+    background: var(--primary-bg-color);
+    border: 1px solid var(--border-color);
+}
+
 /*app scroll*/
 .app-scroll::-webkit-scrollbar-thumb,
 .app-scroll-thin::-webkit-scrollbar-thumb {
