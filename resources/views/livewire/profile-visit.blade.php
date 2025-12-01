@@ -1,5 +1,13 @@
 <div class="max-w-5xl mx-auto p-6 space-y-6">
 
+    <button 
+        onclick="history.back()" 
+        class="flex items-center gap-2 px-4 py-2 text-gray-800 rounded hover:bg-gray-300 transition"
+    >
+        <x-phosphor.icons::regular.arrow-left class="w-4 h-4" />
+        Back
+    </button>
+
     {{-- User Info --}}
     <div class="w-full max-w-7xl mx-auto p-8 bg-white rounded-lg shadow space-y-8">
 
@@ -218,7 +226,7 @@
 
                         <!-- Message -->
                         <p class="mt-2 text-gray-600 text-sm">
-                            "{{ Str::limit($feedback->message, 160) }}"
+                            "{{ Str::limit($feedback->message, 35) }}"
                         </p>
 
                     </div>

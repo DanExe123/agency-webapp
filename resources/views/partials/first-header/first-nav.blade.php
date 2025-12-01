@@ -5,10 +5,31 @@
         <!-- Left -->
         <div class="flex items-center space-x-6">
             <nav class="hidden md:flex space-x-6 fixed">
+                @hasrole('Admin')
+                    <a wire:navigate href="{{ route('admin-dashboard') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
+                        Dashboard
+                        <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                    </a>
+                    <a wire:navigate href="{{ route('admin-UserManage') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
+                        User Management
+                        <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                    </a>
+                    <a wire:navigate href="{{ route('admin-PostManage') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
+                        Post Management
+                        <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                    </a>
+                    <a wire:navigate href="{{ route('admin-Audit') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
+                        Audit Trail
+                        <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                    </a>
+                @endhasrole
+
+             @hasrole('Agency|Company')
               <a wire:navigate href="{{ route('dashboard') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
                   Home
                   <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
               </a>
+              @endhasrole
 
               @hasrole('Agency')
                 @if(Auth::user()->account_status === 'verified')
@@ -44,7 +65,7 @@
 
               @hasanyrole('Company|Agency')
                 @if(Auth::user()->account_status === 'verified')
-                  <a wire:navigate href="{{ route('chatify') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
+                  <a  href="{{ route('chatify') }}" target="_blank"  class="relative group text-gray-500 hover:text-blue-600 transition-colors">
                       Messages
                       <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
                   </a>

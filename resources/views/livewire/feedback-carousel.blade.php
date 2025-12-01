@@ -43,7 +43,7 @@
 
                 <!-- Feedback Message -->
                 <p class="text-sm text-gray-600 mb-4">
-                    "{{ Str::limit($feedback->message, 120) }}"
+                    "{{ Str::limit($feedback->message, 30) }}"
                 </p>
 
                 <!-- Rated By (Bottom) -->

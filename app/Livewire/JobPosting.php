@@ -20,6 +20,7 @@ class JobPosting extends Component
     public $showResponsesModal = false;
     public $expandedPostId = null;
     public $showEvaluation = false;
+    public $showSelectCandidate = false;
     public $selectedPost = null;
 
     protected $listeners = [
@@ -33,8 +34,15 @@ class JobPosting extends Component
         $this->showEvaluation = true;
     }
 
+    public function selectCandidate($postId)
+    {
+        $this->selectedPost = Post::find($postId);
+        $this->showSelectCandidate = true;
+    }
+
     public function backToList()
     {
+        $this->showSelectCandidate = false;
         $this->showEvaluation = false;
         $this->selectedPost = null;
     }
@@ -94,6 +102,29 @@ class JobPosting extends Component
     public function toggleNeeds($postId)
     {
         $this->expandedPostId = $this->expandedPostId === $postId ? null : $postId;
+    }
+
+
+    public function archivePost($id)
+    {
+        $post = Post::where('id', $id)
+                    ->where('user_id', auth()->id())
+                    ->first();
+
+        if ($post && $post->status === 'open') {
+            $post->update(['status' => 'archived']);
+        }
+    }
+
+    public function unarchivePost($id)
+    {
+        $post = Post::where('id', $id)
+                    ->where('user_id', auth()->id())
+                    ->first();
+
+        if ($post && $post->status === 'archived') {
+            $post->update(['status' => 'open']);
+        }
     }
 
     /**

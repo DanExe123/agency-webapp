@@ -44,18 +44,23 @@
     <!-- Content -->
     <div class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-12 gap-6">
         <!-- Sidebar Filters -->
+        <!-- Sidebar Filters -->
         <aside class="col-span-3 bg-white border rounded-md p-4">
             <h3 class="font-semibold mb-2">Location:</h3>
             <hr class="py-2">
             <div class="space-y-2">
                 @foreach($allLocations as $location)
                     <label class="flex items-center">
-                        <input type="checkbox" class="mr-2" value="{{ $location }}" wire:model="searchLocation">
+                        <input type="checkbox" 
+                            class="mr-2" 
+                            value="{{ $location }}" 
+                            wire:model.live="searchLocation">
                         {{ $location }}
                     </label>
                 @endforeach
             </div>
         </aside>
+
 
 
         <!-- Main Listings -->

@@ -56,9 +56,9 @@ class CredentialIndex extends Component
 
         if ($this->step === 1) {
             $this->validate([
-                'logo' => 'required|mimes:pdf,png,jpg,jpeg,doc,docx|max:2048',
-                'bpl'  => 'required|mimes:pdf,png,jpg,jpeg,doc,docx|max:2048',
-                'dti'  => 'required|mimes:pdf,png,jpg,jpeg,doc,docx|max:2048',
+                'logo' => 'required|mimes:png,jpg,jpeg|max:2048',
+                'bpl'  => 'required|mimes:png,jpg,jpeg|max:2048',
+                'dti'  => 'required|mimes:png,jpg,jpeg|max:2048',
                 'about_us' => 'required|string|min:10',
             ]);
 

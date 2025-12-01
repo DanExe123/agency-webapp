@@ -11,17 +11,26 @@ class CompanyProfile extends Component
 {
     public Post $post;
 
+    public $appliedPosts = []; // keep track of applied posts
+
+    protected $listeners = ['proposalSubmitted' => 'refreshAppliedStatus'];
+
     public function mount(Post $post)
     {
         $this->post = $post;
+        $this->refreshAppliedStatus();
     }
 
-    // ✅ Check if the logged-in agency already applied
+    public function refreshAppliedStatus()
+    {
+        $this->appliedPosts = PostResponse::where('agency_id', Auth::id())
+            ->pluck('post_id')
+            ->toArray();
+    }
+
     public function hasApplied($postId)
     {
-        return PostResponse::where('post_id', $postId)
-            ->where('agency_id', Auth::id())
-            ->exists();
+        return in_array($postId, $this->appliedPosts);
     }
 
     public function render()

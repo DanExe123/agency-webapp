@@ -13,18 +13,29 @@ class EvaluateProposals extends Component
     public $dssResults = [];
     public $recommendedAgency = null;
     public $dssExplanation;
-    public $selectedAgencyId = null;
+    public $selectedAgencyIds = [];
 
     public function mount($postId)
     {
-        $this->post = Post::with(['responses.agency', 'responses.proposedRates.guardType'])
-            ->findOrFail($postId);
+        $this->postId = $postId;
+        $this->loadPost(); // Always fresh data
     }
+
+    /** Load ONLY negotiating responses - called on mount & updates */
+    public function loadPost()
+    {
+        $this->post = Post::with(['responses' => function ($query) {
+            $query->whereIn('status', ['accepted', 'negotiating', 'not_selected'])
+                ->with(['agency.profile', 'proposedRates.guardType']);
+        }])->findOrFail($this->postId);
+    }
+
 
     public function openDssModal()
     {
         $responses = $this->post->responses()
             ->with(['agency.profile', 'proposedRates'])
+            ->where('status', 'negotiating')
             ->get();
 
         $results = [];
@@ -82,46 +93,53 @@ class EvaluateProposals extends Component
         $this->showDssModal = true;
     }
 
-    //  set selected agency temporarily
     public function chooseAgency($agencyId)
     {
-        $this->selectedAgencyId = $agencyId;
+        if (in_array($agencyId, $this->selectedAgencyIds)) {
+            $this->selectedAgencyIds = array_diff($this->selectedAgencyIds, [$agencyId]);
+        } else {
+            $this->selectedAgencyIds[] = $agencyId;
+        }
     }
 
     public function proceedDssSelection()
     {
         $this->validate([
-            'selectedAgencyId' => 'required',
+            'selectedAgencyIds' => 'required|array|min:1',
         ], [
-            'selectedAgencyId.required' => 'Please select an agency before proceeding.',
+            'selectedAgencyIds.required' => 'Please select at least one agency before proceeding.',
+            'selectedAgencyIds.min' => 'Please select at least one agency before proceeding.',
         ]);
 
-        // find the selected response
-        $response = $this->post->responses()
-            ->where('agency_id', $this->selectedAgencyId)
-            ->first();
+        foreach ($this->selectedAgencyIds as $agencyId) {
+            $response = $this->post->responses()
+                ->where('agency_id', $agencyId)
+                ->first();
 
-        if ($response) {
-            // update selected agency response to 'negotiating'
-            $response->update(['status' => 'negotiating']);
-
-            $this->post->responses()
-               ->where('agency_id', '!=', $this->selectedAgencyId)
-               ->update(['status' => 'not_selected']);
-
-            // update the post itself to 'proposed'
-            $this->post->update(['status' => 'proposed']);
+            if ($response) {
+                $response->update(['status' => 'accepted']);
+            }
         }
 
-        // close the modal
+        // Update only responses currently with status 'negotiating' and not in selectedAgencyIds
+        $this->post->responses()
+            ->where('status', 'negotiating')
+            ->whereNotIn('agency_id', $this->selectedAgencyIds)
+            ->update(['status' => 'not_selected']);
+
+        $this->post->update(['status' => 'proposed']);
+
+        $this->loadPost();
+        $this->selectedAgencyIds = [];
         $this->showDssModal = false;
 
-        // optional success message
-        session()->flash('success', 'The selected agency is now marked as negotiating.');
+        session()->flash('success', 'Selected agencies marked as accepted.');
     }
 
     public function render()
     {
+        // Always ensure fresh negotiating data in view
+        $this->loadPost();
         return view('livewire.evaluate-proposals');
     }
 }

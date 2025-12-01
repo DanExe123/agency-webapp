@@ -20,7 +20,10 @@
             @forelse($posts as $post)
                 <div class="min-w-[300px] flex-shrink-0 bg-white p-6 rounded-lg shadow-lg border border-transparent hover:border-black hover:shadow-xl hover:scale-[1.02] transition-transform duration-300">
                     <!-- Top section: Avatar, name, arrow -->
-                    <a href="{{ route('profile.visit', $post->user->id) }}" wire:navigate class="flex items-center justify-between w-full space-x-4">
+                    @php 
+                        $canVisit = auth()->check() && auth()->user()->account_status === 'verified'; 
+                    @endphp
+                    <a  href="{{ $canVisit ? route('profile.visit', $post->user->id) : '#' }}" wire:navigate class="flex items-center justify-between w-full space-x-4">
                         <div class="flex items-center space-x-4 flex-1">
                             <div class="w-12 h-12 bg-white flex items-center justify-center rounded-md overflow-hidden">
                                 @if($post->user->profile && $post->user->profile->logo_path)
@@ -51,7 +54,11 @@
 
                     <!-- Open For More Info -->
                     @auth
-                        <a wire:navigate href="{{ route('company-profile', $post->id) }}"
+                        @php 
+                            $canVisit = auth()->check() && auth()->user()->account_status === 'verified'; 
+                        @endphp
+                    
+                        <a href="{{ $canVisit ? route('company-profile', $post->id) : '#' }}" wire:navigate
                         class="mt-4 block text-center bg-[#0000006B] text-[#1E1E1E] text-sm py-2 px-4 rounded-md w-full font-bold transition-colors duration-300 hover:bg-black hover:text-white">
                             Open For More Info...
                         </a>

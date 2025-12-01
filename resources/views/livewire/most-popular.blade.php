@@ -3,8 +3,13 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" data-aos="fade-up" data-aos-duration="2000">
 
         @foreach($posts as $agency)
-        <a href="{{ route('profile.visit', $agency->id) }}" wire:navigate 
-   class="p-5 bg-white border rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-200 space-y-3 block">
+       
+        @php 
+    $canVisit = auth()->check() && auth()->user()->account_status === 'verified'; 
+@endphp
+
+        <a  href="{{ $canVisit ? route('profile.visit', $agency->id) : '#' }}" wire:navigate 
+            class="p-5 bg-white border rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-200 space-y-3 block">
 
 
             <!-- Logo + Name -->

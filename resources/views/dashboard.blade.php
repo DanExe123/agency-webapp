@@ -36,12 +36,18 @@
   {{-- Only show this layout if user has any of these roles --}}
   @hasanyrole('Admin|Agency|Company')
     
+  
     <!-- Navbar -->
     @include('partials.first-header.first-nav')
-    @include('partials.first-header.second-nav')
+   
 
     <!-- Hero Section -->
     @include('partials.first-section')
+
+      @role('Agency')
+    <!-- Company post Section -->
+      @include('partials.fourth-section')
+    @endrole
 
     <!-- Most Popular Agencies Section -->
     @role('Company')
@@ -49,11 +55,6 @@
     @endrole
 
     @include('partials.third-section')
-
-    @role('Agency')
-    <!-- Company post Section -->
-      @include('partials.fourth-section')
-    @endrole
 
     @role('Company')
       @include('partials.fifth-section')

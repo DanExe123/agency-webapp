@@ -14,19 +14,32 @@ class PostResponseForm extends Component
     public $message;
     public $proposedRates = []; // [guard_type_id => rate]
     public $toast = null;
+    public $post;
 
     protected $rules = [
-        'message' => 'required|string|min:10',
-        'proposedRates.*' => 'nullable|numeric|min:0',
+        'message' => 'required|string',
+        'proposedRates.*' => 'required|numeric|min:0',
     ];
 
     public function mount($postId)
     {
-        $post = Post::with('guardNeeds.guardType')->findOrFail($postId);
-        foreach ($post->guardNeeds as $need) {
+        $this->postId = $postId;
+        $this->post = Post::with('guardNeeds.guardType')->findOrFail($postId);
+
+        foreach ($this->post->guardNeeds as $need) {
             $this->proposedRates[$need->guard_type_id] = null;
         }
     }
+
+    public function preSubmit()
+{
+    // Validate first
+    $this->validate();
+
+    // If validation passes, trigger Alpine to open confirmation modal
+    $this->dispatch('open-confirm-modal');
+}
+
 
     public function submit()
     {
@@ -50,16 +63,22 @@ class PostResponseForm extends Component
         }
 
         $this->reset(['message', 'proposedRates']);
+        foreach ($this->post->guardNeeds as $need) {
+            $this->proposedRates[$need->guard_type_id] = null;
+        }
 
         $this->toast = [
             'type' => 'success',
             'message' => 'Proposal sent successfully!',
         ];
+
+       // $this->dispatch('proposalSubmitted');
     }
 
     public function render()
     {
-        $post = Post::with('guardNeeds.guardType')->find($this->postId);
-        return view('livewire.post-response-form', ['post' => $post]);
+        return view('livewire.post-response-form', [
+            'post' => $this->post,
+        ]);
     }
 }

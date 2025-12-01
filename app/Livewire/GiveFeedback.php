@@ -4,70 +4,83 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Post;
-use App\Models\PostResponse;
 use App\Models\Feedback;
+use App\Models\PostResponse;
 use Illuminate\Support\Facades\Auth;
 
 class GiveFeedback extends Component
 {
     public $postId;
-    public $message = '';
-    public $rating = 0; // default rating
+    public $acceptedResponses = [];
+    public $ratings = [];        // ['response_id' => rating]
+    public $messages = [];       // ['response_id' => message]
     public $showModal = false;
-    public $userId; // ID of the user being rated
-    public $userName; // Name of the user being rated
-    public $user;
 
     protected $rules = [
-        'message' => 'required|string|max:500',
-        'rating' => 'required|integer|min:1|max:5',
+        'ratings' => 'array',
+        'ratings.*' => 'required|integer|min:1|max:5',
+        'messages' => 'array',
+        'messages.*' => 'required|string|max:500',
     ];
 
-   public function openModal($postId)
+    public function mount($postId)
     {
         $this->postId = $postId;
+        $this->loadAcceptedResponses();
+    }
 
-        // Get the negotiating agency for this post
-        $post = Post::with('responses.agency.profile')->find($postId);
-        $negotiating = $post?->responses->firstWhere('status', 'negotiating');
-
-        if ($negotiating && $negotiating->agency) {
-            $this->userId = $negotiating->agency_id;
-            $this->userName = $negotiating->agency->name ?? 'Unknown Agency';
-            $this->user = $negotiating->agency; // <-- assign the user object here
+    public function loadAcceptedResponses()
+    {
+        $post = Post::with(['responses.agency.profile'])->find($this->postId);
+        $this->acceptedResponses = $post?->responses
+            ->where('status', 'accepted')
+            ->map(function ($response) {
+                return [
+                    'id' => $response->id,
+                    'agency_id' => $response->agency_id,
+                    'agency_name' => $response->agency->name ?? 'Unknown',
+                    'logo_path' => $response->agency->profile?->logo_path ?? null,
+                ];
+            })->values()->toArray() ?? [];
+        
+        // Initialize arrays for each response
+        foreach ($this->acceptedResponses as $response) {
+            $this->ratings[$response['id']] = 0;
+            $this->messages[$response['id']] = '';
         }
+    }
 
+    public function openModal()
+    {
+        if (empty($this->acceptedResponses)) {
+            session()->flash('error', 'No accepted agencies found.');
+            return;
+        }
         $this->showModal = true;
     }
 
-    public function submitFeedback()
+    public function submitAllFeedback()
     {
         $this->validate();
 
-        $post = Post::find($this->postId);
+        foreach ($this->acceptedResponses as $response) {
+            Feedback::create([
+                'sender_id' => Auth::id(),
+                'receiver_id' => $response['agency_id'],
+                'post_response_id' => $response['id'],
+                'message' => $this->messages[$response['id']],
+                'rating' => $this->ratings[$response['id']],
+            ]);
 
-        if ($post) {
-            // Update PostResponse that is negotiating
-            $negotiatingResponse = $post->responses()->where('status', 'negotiating')->first();
-            if ($negotiatingResponse) {
-                $negotiatingResponse->update(['status' => 'completed_negotiating']);
-                
-                // Save feedback
-                Feedback::create([
-                    'sender_id' => Auth::id(),
-                    'receiver_id' => $negotiatingResponse->agency_id,
-                    'message' => $this->message,
-                    'rating' => $this->rating,
-                ]);
-            }
-
-            // Update Post status
-            $post->update(['status' => 'completed']);
+            PostResponse::where('id', $response['id'])
+                ->update(['status' => 'completed_negotiating']);
         }
 
+        Post::find($this->postId)->update(['status' => 'completed']);
+        
         $this->showModal = false;
-        $this->reset(['message', 'rating']);
-       // $this->emit('postUpdated'); // optional, refresh parent list
+        $this->reset(['ratings', 'messages']);
+        session()->flash('success', 'All feedback submitted!');
     }
 
     public function render()

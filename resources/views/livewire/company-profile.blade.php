@@ -1,59 +1,15 @@
 <!-- Header -->
 <div>
-<header class="bg-white shadow-sm relative py-4">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-
-            <!-- Left: Icon + Search with Flag -->
-            <div class="flex items-center space-x-3">
-                <!-- Icon -->
-                <div class="flex gap-1 justify-start">
-                    <x-phosphor.icons::regular.briefcase class="w-6 h-6 text-gray-600" />
-                    <h1 class="font-bold text-gray-700">ESecurityJobs</h1>
-                </div>
-
-                <!-- Search Box with Flag Selector -->
-                <div class="relative flex items-center border border-gray-300 rounded-md overflow-hidden">
-                    <!-- Flag Dropdown -->
-                    <div x-data="{ open: false }" class="relative">
-                        <button @click="open = !open" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
-                            <!-- Static PH flag -->
-                            <img src="{{ asset('ph.png') }}" alt="PH Flag" class="w-5 h-3 mr-1">
-                            <x-phosphor.icons::regular.caret-down class="w-4 h-4 text-gray-900 ml-1" />
-                        </button>
-                    </div>
-                    <!-- Divider -->
-                    <div class="w-px h-6 bg-gray-300 mx-2"></div>
-
-                    <!-- Search Input -->
-                    <div class="relative flex-1">
-                        <input type="text" placeholder="agency title, keyword, company"
-                               class="w-[500px] pl-8 pr-3 py-3 text-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 border-0">
-                        <x-phosphor.icons::regular.magnifying-glass class="w-5 h-5 text-gray-400 absolute left-2 top-3" />
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right: Sign In Button -->
-            <div>
-                <a wire:navigate href="{{ route('loginform') }}">
-                    <button class="px-4 py-2 border bg-black rounded-md text-sm font-medium hover:bg-gray-100 hover:text-black text-white">
-                        Log Out
-                    </button>
-                </a>
-            </div>
-
-        </div>
-    </div>
-</header>
-
- <!-- Navbar -->
- <header class="bg-gray-100 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between">
-        <h2 class="text-lg font-semibold">Company Details</h2>
-        <nav class="text-sm text-gray-500">Home / Company</nav>
-    </div>
-</header>
+    <!-- Back Button -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+    <button 
+        onclick="history.back()" 
+        class="flex items-center gap-2 px-4 py-2 text-gray-800 rounded hover:bg-gray-300 transition"
+    >
+        <x-phosphor.icons::regular.arrow-left class="w-4 h-4" />
+        Back
+    </button>
+</div>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Company Details -->
@@ -99,7 +55,7 @@
             </div>
         </div>
 
-        <div x-data="{ openResponseModal: false }" class="flex justify-end gap-2">
+        <div class="flex justify-end gap-2">
             <button class="px-4 py-2 bg-gray-400 text-white rounded-md w-14 h-10">
                 <x-phosphor.icons::regular.bookmark-simple class="w-4 h-4 text-black" />
             </button>
@@ -115,12 +71,7 @@
                 </button>
 
             @else
-                <button 
-                    @click="openResponseModal = true"
-                    class="px-4 py-2 bg-gray-900 text-white rounded-md w-32 h-10 hover:bg-gray-700 transition"
-                >
-                    Apply
-                </button>
+                <livewire:post-response-form :postId="$post->id" />
             @endif
 
 
@@ -130,38 +81,8 @@
                 rel="noopener noreferrer">
                  Chat With Company
                  <x-phosphor.icons::regular.arrow-right class="w-4 h-4 text-white mt-1" />
-             </a>
+             </a>  
 
-            <!-- Alpine Modal -->
-            <div 
-                x-show="openResponseModal"
-                x-transition.opacity.duration.300ms
-                class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-            >
-                <div 
-                    @click.away="openResponseModal = false"
-                    x-transition.scale.duration.300ms
-                    class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative"
-                >
-                    <!-- Close Button -->
-                    <button 
-                        @click="openResponseModal = false"
-                        class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl font-bold"
-                    >
-                        &times;
-                    </button>
-
-                    <!-- Header -->
-                    <h2 class="text-xl font-bold text-gray-800 border-b pb-2">
-                        Send Proposal
-                    </h2>
-
-                    <!-- Livewire Component -->
-                    <div class="pt-4">
-                        <livewire:post-response-form :postId="$post->id" />
-                    </div>
-                </div>
-            </div>
         </div>
 
     </div>

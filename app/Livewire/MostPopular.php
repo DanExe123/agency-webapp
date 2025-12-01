@@ -21,7 +21,7 @@ class MostPopular extends Component
             ])
             ->with(['profile', 'feedbacksReceived']) // rating + logo
             ->orderBy('completed_posts_count', 'desc')
-            ->take(10)
+            ->take(5)
             ->get();
     }
 

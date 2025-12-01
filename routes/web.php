@@ -18,7 +18,7 @@ use App\Livewire\JobPosting;
 use App\Livewire\CompanyPosted;
 use App\Livewire\MostPopular;
 use App\Livewire\PostApplied;
-
+use App\Livewire\SearchControl;
 
 
 //company
@@ -29,6 +29,9 @@ use App\Livewire\AgencyDashboard;
 
 //Admin
 use App\Livewire\AdminDashboard;
+use App\Livewire\AdminUserManagement;
+use App\Livewire\AdminPostManagement;
+use App\Livewire\AdminAuditTrail;
 
 use App\Http\Controllers\DownloadController;
 
@@ -78,6 +81,8 @@ Route::middleware(['auth', 'verified', 'role:Company|Agency'])->group(function (
     Route::get('/profile/{user}', ProfileVisit::class)
     ->name('profile.visit');
 
+   Route::get('/search', SearchControl::class)->name('search');
+
 });
 
 // specific feature  function for company only 
@@ -99,6 +104,12 @@ Route::middleware(['auth'])->group(function () {
 // Admin Dashboard
 Route::middleware(['auth', 'role:Admin'])->group(function () {
     Route::get('/admin-dashboard', AdminDashboard::class)->name('admin-dashboard'); 
+    Route::get('/admin-UserManage', AdminUserManagement::class)->name('admin-UserManage'); 
+
+    Route::get('/admin-PostManage', AdminPostManagement::class)->name('admin-PostManage'); 
+
+    Route::get('/admin-Audit', AdminAuditTrail::class)->name('admin-Audit'); 
+
 });
 
 

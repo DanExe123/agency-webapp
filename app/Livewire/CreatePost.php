@@ -29,6 +29,22 @@ class CreatePost extends Component
         $this->guardNeeds = array_values($this->guardNeeds); // reindex
     }
 
+    public function preSubmit()
+{
+    // Validate inputs first
+    $this->validate([
+        'description' => 'required|string',
+        'requirements' => 'nullable|string',
+        'guardNeeds.*.guard_type_id' => 'required|exists:security_guard_types,id',
+        'guardNeeds.*.quantity' => 'required|integer|min:1',
+    ]);
+
+    // If validation passes, tell Alpine to open confirmation modal
+    $this->dispatch('open-confirm-modal');
+}
+
+
+
     public function submit()
     {
         $this->validate([
@@ -69,7 +85,8 @@ class CreatePost extends Component
         $this->reset(['description', 'requirements', 'guardNeeds']);
         $this->guardNeeds = [['guard_type_id' => '', 'quantity' => '']];
 
-        $this->dispatch('postCreated');
+          // Emit a browser event to trigger the success modal
+        $this->dispatch('post-created');
 
         $this->toast = [
             'type' => 'success',

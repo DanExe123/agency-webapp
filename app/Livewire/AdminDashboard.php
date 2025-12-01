@@ -1,90 +1,42 @@
-<?php
-
+<?php // app/Livewire/AdminDashboard.php - ✅ FIXED FOR post_responses
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\UserProfile;
 use App\Models\User;
+use App\Models\Post;
+use App\Models\PostResponse;
 
 class AdminDashboard extends Component
 {
-    public $profiles;
-    public $selectedProfile = null;
-    public $showModal = false;
-
-    public $rejectUserId = null;
-    public $rejectFeedback = '';
-    public $showRejectModal = false;
-
-    public function mount()
-    {
-        // Fetch all profiles with their user (who now has account_status)
-        $this->profiles = UserProfile::with('user')->get();
-    }
-
-    public function openModal($profileId)
-    {
-        $this->selectedProfile = UserProfile::with('user')->find($profileId);
-        $this->showModal = true;
-    }
-
-    public function closeModal()
-    {
-        $this->showModal = false;
-        $this->selectedProfile = null;
-    }
-
-    public function openRejectModal($userId)
-    {
-        $this->rejectUserId = $userId;
-        $this->rejectFeedback = '';
-        $this->showRejectModal = true;
-    }
-
-    public function closeRejectModal()
-    {
-        $this->showRejectModal = false;
-        $this->rejectUserId = null;
-        $this->rejectFeedback = '';
-    }
-
-    public function approve($userId)
-    {
-        $user = User::find($userId);
-        if ($user) {
-            $user->account_status = 'verified';
-            $user->rejection_feedback = null;
-            $user->save();
-
-            session()->flash('message', 'User account approved successfully.');
-            $this->mount();
-        }
-    }
-
-    public function reject()
-    {
-        $this->validate([
-            'rejectFeedback' => 'required|string|max:500',
-        ]);
-
-        if ($this->rejectUserId) {
-            $user = User::find($this->rejectUserId);
-            if ($user) {
-                $user->account_status = 'rejected';
-                $user->rejection_feedback = $this->rejectFeedback;
-                $user->save();
-
-                session()->flash('message', 'User account rejected with feedback.');
-                $this->closeRejectModal();
-                $this->mount();
-            }
-        }
-    }
-
     public function render()
     {
-        return view('livewire.admin-dashboard', [
-            'profiles' => $this->profiles
-        ]);
+        // Existing counts
+        $totalUsers = User::whereDoesntHave('roles', function($query) {
+            $query->where('name', 'Admin');
+        })->where('account_status', 'verified')->count();
+
+        $pendingVerification = User::where('account_status', 'pending')->count();
+        $verifiedAgencies = User::role('Agency')->where('account_status', 'verified')->count();
+        $verifiedCompanies = User::role('Company')->where('account_status', 'verified')->count();
+
+        // ✅ FIXED: Count completed_negotiating PostResponses
+        $completedNegotiatingCount = PostResponse::where('status', 'completed_negotiating')->count();
+
+        // ✅ TOP 5 AGENCIES by completed_negotiating PostResponses
+        $topAgencies = User::role('Agency') // ✅ Capital 'A' matches your role
+            ->withCount([
+                'postResponses AS completed_negotiating_count' => function($query) {
+                    $query->where('status', 'completed_negotiating');
+                }
+            ])
+            ->with('profile')
+            ->orderBy('completed_negotiating_count', 'desc')
+            ->take(5)
+            ->get();
+
+        return view('livewire.admin-dashboard', compact(
+            'totalUsers', 'pendingVerification', 'verifiedAgencies', 'verifiedCompanies',
+            'completedNegotiatingCount', 'topAgencies'
+        ));
     }
 }

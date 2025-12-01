@@ -42,7 +42,7 @@
     </head>
     <body class="font-sans antialiased">
   <!-- Navbar -->
-  @role('Agency|Company')
+  @role('Admin|Agency|Company')
   @include('partials.first-header.first-nav')
   @endrole
   

@@ -58,14 +58,14 @@
 
                 {{-- Case 1: Temp uploaded file --}}
                 @if ($logo instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
-                    <span class="text-sm font-medium text-gray-600 truncate">{{ $logo->getClientOriginalName() }}</span>
+                    <span class="text-sm font-medium text-gray-600 truncate">{{ Str::limit($logo->getClientOriginalName() ?? $profile->logo_original_name ?? basename($logo), 20, '...') }}</span>
                     <button type="button" class="absolute top-2 right-2 text-red-500 text-lg"
                         wire:click="$set('logo', null)">✕</button>
 
                 {{-- Case 2: Already saved file from DB --}}
                 @elseif(!empty($logo))
                     <span class="text-sm font-medium text-gray-600 truncate">
-                        {{ $profile->logo_original_name ?? basename($logo) }}
+                        {{ Str::limit($profile->logo_original_name ?? basename($logo), 20, '...') }}
                     </span>
                     <button type="button" class="absolute top-2 right-2 text-red-500 text-lg"
                         wire:click="$set('logo', null)">✕</button>
@@ -88,13 +88,13 @@
 
                 @if ($bpl instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
                     <span
-                        class="text-sm font-medium text-gray-600 truncate">{{ $bpl->getClientOriginalName() }}</span>
+                        class="text-sm font-medium text-gray-600 truncate">{{ Str::limit($bpl->getClientOriginalName() ?? $profile->bpl_original_name ?? basename($bpl), 20, '...') }} </span>
                     <button type="button" class="absolute top-2 right-2 text-red-500 text-lg"
                         wire:click="$set('bpl', null)">✕</button>
 
                 @elseif(!empty($bpl))
                     <span class="text-sm font-medium text-gray-600 truncate">
-                        {{ $profile->bpl_original_name ?? basename($bpl) }}
+                         {{ Str::limit($profile->bpl_original_name ?? basename($bpl), 20, '...') }}
                     </span>
                     <button type="button" class="absolute top-2 right-2 text-red-500 text-lg"
                         wire:click="$set('bpl', null)">✕</button>
@@ -116,13 +116,14 @@
 
                 @if ($dti instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
                     <span
-                        class="text-sm font-medium text-gray-600 truncate">{{ $dti->getClientOriginalName() }}</span>
+                        class="text-sm font-medium text-gray-600 truncate">{{ Str::limit($dti->getClientOriginalName() ?? $profile->dti_original_name ?? basename($dti), 20, '...') }}</span>
                     <button type="button" class="absolute top-2 right-2 text-red-500 text-lg"
                         wire:click="$set('dti', null)">✕</button>
 
                 @elseif(!empty($dti))
                     <span class="text-sm font-medium text-gray-600 truncate">
-                        {{ $profile->dti_original_name ?? basename($dti) }}
+                        
+                         {{ Str::limit($profile->dti_original_name ?? basename($dti), 20, '...') }}
                     </span>
                     <button type="button" class="absolute top-2 right-2 text-red-500 text-lg"
                         wire:click="$set('dti', null)">✕</button>
@@ -163,14 +164,46 @@
           </select>
           @error('organization_type') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
+
         <div>
-          <label class="block text-sm font-medium text-gray-700">Industry Types</label>
-          <select wire:model="industry_type" class="mt-1 block w-full border py-2 rounded-md text-gray-400">
-            <option>Select...</option>
-            <option value="Security">Security</option>
-          </select>
-          @error('industry_type') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-        </div>
+    <label class="block text-sm font-medium text-gray-700 mb-2">Industry Types</label>
+    <select wire:model="industry_type" class="w-full border border-gray-300 py-3 px-4 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+        <option value="">Select Industry...</option>
+        
+        @role('Agency')
+            <optgroup label="Select">
+                <option value="Security">Security</option>
+                <option value="Private Investigation">Private Investigation</option>
+                <option value="Cybersecurity">Cybersecurity</option>
+                <option value="Facility Management / Guarding Services">Facility Management / Guarding Services</option>
+                <option value="Event Security">Event Security</option>
+            </optgroup>
+        @endrole
+
+        @role('Company')
+            <optgroup label="Select">
+                <option value="Banking & Finance">Banking & Finance</option>
+                <option value="Retail & Shopping">Retail & Shopping</option>
+                <option value="Hospitality & Tourism">Hospitality & Tourism</option>
+                <option value="Education & Training">Education & Training</option>
+                <option value="Healthcare & Medical Services">Healthcare & Medical Services</option>
+                <option value="Real Estate & Construction">Real Estate & Construction</option>
+                <option value="Manufacturing & Processing">Manufacturing & Processing</option>
+                <option value="Transportation & Logistics">Transportation & Logistics</option>
+                <option value="Agriculture & Agribusiness">Agriculture & Agribusiness</option>
+                <option value="Food & Beverage / Restaurants">Food & Beverage / Restaurants</option>
+                <option value="Telecommunications">Telecommunications</option>
+                <option value="Entertainment & Media">Entertainment & Media</option>
+                <option value="Energy & Utilities">Energy & Utilities</option>
+                <option value="Arts, Culture & Creative Services">Arts, Culture & Creative Services</option>
+                <option value="Professional Services">Professional Services</option>
+            </optgroup>
+        @endrole
+    </select>
+    @error('industry_type') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+</div>
+
+
         <div>
           <label class="block text-sm font-medium text-gray-700">Team Size</label>
           <select wire:model="team_size" class="mt-1 block w-full border py-2 rounded-md text-gray-400">

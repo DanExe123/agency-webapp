@@ -1,7 +1,7 @@
 <div class="bg-white shadow-lg rounded-lg p-6 mt-8">
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-lg font-semibold text-gray-800">
-            Evaluating Proposals for: {{ $post->description }}
+            Select Candidate Proposals for: {{ $post->description }}
         </h2>
         <button 
             wire:click="$dispatch('backToList')" 
@@ -26,7 +26,6 @@
                     <th class="px-4 py-2 text-left">Proposed Rates</th>
                     <th class="px-4 py-2 text-left">Submitted</th>
                     <th class="px-4 py-2 text-center">Status</th>
-                    <th class="px-4 py-2 text-center">Action</th>
                 </tr>
             </thead>
             <tbody class="text-sm text-gray-800">
@@ -90,31 +89,14 @@
                                     'pending' => 'bg-yellow-100 text-yellow-800',
                                     'not_selected' => 'bg-yellow-100 text-yellow-800',
                                     'negotiating' => 'bg-blue-100 text-blue-800',
-                                    'accepted' => 'bg-green-100 text-green-800',
                                     'closed' => 'bg-green-100 text-green-800',
                                     'rejected' => 'bg-red-100 text-red-800',
                                 ];
                             @endphp
 
-                            <span class="px-2 py-1 rounded text-xs font-semibold whitespace-nowrap {{ $colors[$status] ?? 'bg-gray-100 text-gray-800' }}">
+                            <span class="px-2 py-1 rounded text-xs font-semibold {{ $colors[$status] ?? 'bg-gray-100 text-gray-800' }}">
                                 {{ ucwords(str_replace('_', ' ', $status)) }}
                             </span>
-                        </td>
-
-                        <!-- NEW CHAT COLUMN -->
-                        <td class="px-4 py-2 text-center align-top">
-                            <a 
-                                href="{{ url('chatify', $response->agency_id) }}" 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                class="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs rounded-md transition-colors duration-200"
-                                title="Chat with {{ $response->agency->name }}"
-                            >
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 4.03 9 8z"></path>
-                                </svg>
-                                Chat
-                            </a>
                         </td>
 
                     </tr>
@@ -133,34 +115,42 @@
     <!-- Button to open DSS modal -->
     <div class="flex justify-end mt-4">
         @php
-            $hasAccepted = $post->responses->contains('status', 'accepted');
+            // Check if ANY responses have status 'negotiating' OR 'accepted'
+            $hasNegotiatingOrAccepted = $post->responses->contains(function($response) {
+                return in_array($response->status, ['negotiating', 'accepted']);
+            });
         @endphp
 
-        @if(!$hasAccepted)
+        @if(!$hasNegotiatingOrAccepted)
             <button 
                 wire:click="openDssModal"
                 class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm">
                 Select Agency
             </button>
         @endif
-    </div>                  
+    </div>
+              
 
     <!-- DSS Modal -->
     <div x-data="{ open: @entangle('showDssModal') }" x-show="open"
         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" x-cloak>
         <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Select Agency (To be accepted)</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Select Agency (To be candidate)</h3>
 
-            @if($recommendedAgency)
-                <div class="mb-4 p-3 bg-green-50 text-green-800 border border-green-200 rounded">
-                    <strong>Recommended Agency:</strong> {{ $recommendedAgency }}
-                    <p class="text-sm mt-1 text-gray-700">{!! $dssExplanation !!}</p>
-                </div>
+            @if(!empty($recommendedAgencies))
+                @foreach($recommendedAgencies as $agency)
+                    <div class="mb-4 p-3 bg-green-50 text-green-800 border border-green-200 rounded">
+                        <strong>Recommended Agency:</strong> {{ $agency['agency_name'] }}
+                        <p class="text-sm mt-1 text-gray-700">
+                            Average Rate: ₱{{ number_format($agency['average_rate'], 2) }}, 
+                            Rating: {{ number_format($agency['rating'], 1) }}
+                        </p>
+                    </div>
+                @endforeach
             @endif
 
             <div class="relative w-full">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Select Agency</label>
-
+                <label class="block text-sm font-medium text-gray-700 mb-1">Select at least three(3) Agencies</label>
                 <div x-data="{ dropdownOpen: false }" class="relative">
                     <button type="button" @click="dropdownOpen = !dropdownOpen"
                         class="w-full border border-gray-300 rounded-md px-3 py-2 text-left flex justify-between items-center focus:ring-2 focus:ring-blue-500">
@@ -215,10 +205,11 @@
                         @endforeach
                     </div>
                 </div>
-                @error('selectedAgencyId')
+                @error('selectedAgencyIds')
                     <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
                 @enderror
             </div>
+
 
             <div class="flex justify-end gap-2 mt-6">
                 <button x-on:click="open = false"

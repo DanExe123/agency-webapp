@@ -1,54 +1,7 @@
 <div>
-<header class="bg-white shadow-sm relative py-4">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-
-            <!-- Left: Icon + Search with Flag -->
-            <div class="flex items-center space-x-3">
-                <!-- Icon -->
-                <div class="flex gap-1 justify-start">
-                    <x-phosphor.icons::regular.briefcase class="w-6 h-6 text-gray-600" />
-                    <h1 class="font-bold text-gray-700">ESecurityJobs</h1>
-                </div>
-
-                <!-- Search Box with Flag Selector -->
-                <div class="relative flex items-center border border-gray-300 rounded-md overflow-hidden">
-                    <!-- Flag Dropdown -->
-                    <div x-data="{ open: false }" class="relative">
-                        <button @click="open = !open" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
-                            <!-- Static PH flag -->
-                            <img src="{{ asset('ph.png') }}" alt="PH Flag" class="w-5 h-3 mr-1">
-                            <x-phosphor.icons::regular.caret-down class="w-4 h-4 text-gray-900 ml-1" />
-                        </button>
-                    </div>
-                    <!-- Divider -->
-                    <div class="w-px h-6 bg-gray-300 mx-2"></div>
-
-                    <!-- Search Input -->
-                    <div class="relative flex-1">
-                        <input type="text" placeholder="agency title, keyword, company"
-                               class="w-[500px] pl-8 pr-3 py-3 text-sm focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 border-0">
-                        <x-phosphor.icons::regular.magnifying-glass class="w-5 h-5 text-gray-400 absolute left-2 top-3" />
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right: Sign In Button -->
-            <div>
-                <a wire:navigate href="{{ route('loginform') }}">
-                    <button class="px-4 py-2 border bg-black rounded-md text-sm font-medium hover:bg-gray-100 hover:text-black text-white">
-                        Log Out
-                    </button>
-                </a>
-            </div>
-
-        </div>
-    </div>
-</header>
-
-    <div x-data="{ openModal: false }" class="max-w-7xl mx-auto mt-8 px-6">
+    <div class="max-w-7xl mx-auto mt-8 px-6">
         <!-- Top Controls -->
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+        <div class="flex flex-col md:flex-row items-center  w-full">
             <div class="flex flex-wrap items-center gap-3">
                 <!-- Search -->
                 <div class="relative">
@@ -70,45 +23,14 @@
                     <option value="open">Open</option>
                     <option value="proposed">Proposed</option>
                     <option value="closed">Closed</option>
+                    <option value="archived">Archived</option>
+                    <option value="completed">Completed</option>
                 </select>
             </div>
 
             <!-- Create Button (Right aligned) -->
-            <button 
-                @click="openModal = true"
-                class="bg-black text-white px-5 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition"
-            >
-                + Create Job Post
-            </button>
-        </div>
-
-        <!-- Modal -->
-        <div 
-            x-show="openModal" 
-            x-transition 
-            class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-            >
-            <div 
-                @click.away="openModal = false"
-                class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative"
-            >
-                <!-- X Button -->
-                <button 
-                    @click="openModal = false"
-                    class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl font-bold"
-                >
-                    &times;
-                </button>
-
-                <!-- Modal Header -->
-                <h2 class="text-xl font-bold text-gray-800 border-b pb-2">
-                    Create New Job Post
-                </h2>
-
-                <!-- Modal Body -->
-                <div class="pt-4 space-y-4">
-                    <livewire:create-post />
-                </div>
+            <div class="ml-auto">
+                <livewire:create-post />
             </div>
         </div>
 
@@ -189,9 +111,14 @@
             </div>
         </div>
 
-        <!-- Job Posts Table -->
-        @if(!$showEvaluation)
-            <div class="bg-white shadow rounded-lg overflow-hidden mt-8 ">
+        @if($showSelectCandidate)
+            <livewire:select-proposals :postId="$selectedPost->id" />
+
+        @elseif($showEvaluation)
+            <livewire:evaluate-proposals :postId="$selectedPost->id" />
+
+        @else
+            <div wire:poll class="bg-white shadow rounded-lg overflow-hidden mt-2 ">
                 <div class="max-h-[600px] overflow-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-100">
@@ -262,48 +189,120 @@
                                     <td class="px-6 py-4 text-sm text-gray-800">
                                         <div class="flex items-center justify-center gap-3">
                                             @php
-                                                $negotiating = $post->responses->first(function($response) {
-                                                    return in_array($response->status, ['negotiating', 'completed_negotiating']);
+                                                $targetResponses = $post->responses->filter(function($response) {
+                                                    return in_array($response->status, ['accepted', 'completed_negotiating']);
                                                 });
+                                                $count = $targetResponses->count();
                                             @endphp
 
-                                            @if($negotiating)
-                                                <a href="{{ route('profile.visit', $negotiating->agency_id) }}" wire:navigate class="flex items-center gap-2">
-                                                    @if($negotiating->agency && $negotiating->agency->profile)
-                                                        <img 
-                                                            src="{{ asset('storage/' . $negotiating->agency->profile->logo_path) }}"
-                                                            class="w-8 h-8 rounded-full"
-                                                            alt="{{ $negotiating->agency->name }}"
-                                                        >
-                                                    @endif
-                                                    <span>{{ $negotiating->agency->name ?? 'Unknown Agency' }}</span>
-                                                </a>
+                                            @if($count > 0)
+                                                @if($count === 1)
+                                                    {{-- SINGLE AGENCY: Direct display --}}
+                                                    @php $negotiating = $targetResponses->first(); @endphp
+                                                    <a href="{{ route('profile.visit', $negotiating->agency_id) }}" wire:navigate class="flex items-center gap-2">
+                                                        @if($negotiating->agency && $negotiating->agency->profile)
+                                                            <img 
+                                                                src="{{ asset('storage/' . $negotiating->agency->profile->logo_path) }}"
+                                                                class="w-8 h-8 rounded-full"
+                                                                alt="{{ $negotiating->agency->name }}"
+                                                            >
+                                                        @endif
+                                                        <span>{{ $negotiating->agency->name ?? 'Unknown Agency' }}</span>
+                                                    </a>
+                                                    <!-- CHAT BUTTON -->
+                                                    <a 
+                                                        href="{{ url('chatify', $negotiating->agency_id) }}" 
+                                                        target="_blank" 
+                                                        rel="noopener noreferrer"
+                                                        class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs rounded-md"
+                                                    >
+                                                        Chat
+                                                    </a>
 
-                                                <!-- CHAT BUTTON -->
-                                                <a 
-                                                    href="{{ url('chatify', $negotiating->agency_id) }}" 
-                                                    target="_blank" 
-                                                    rel="noopener noreferrer"
-                                                    class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs rounded-md"
-                                                >
-                                                    Chat
-                                                </a>
-                                                
+                                                @else
+                                                    {{-- MULTIPLE AGENCIES: Pure Alpine.js Dropdown --}}
+                                                    <div x-data="{ open: false }" @click.outside="open = false" class="relative">
+                                                        <!-- Count Badge Button -->
+                                                        <button 
+                                                            @click="open = !open"
+                                                            class="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md text-sm font-medium transition-colors duration-200"
+                                                        >
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                                            </svg>
+                                                            <span>{{ $count }} agencies</span>
+                                                            <svg class="w-4 h-4 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                                            </svg>
+                                                        </button>
+
+                                                        <!-- Dropdown -->
+                                                        <div 
+                                                            x-show="open" 
+                                                            x-transition:enter="transition ease-out duration-200"
+                                                            x-transition:enter-start="opacity-0 transform scale-95"
+                                                            x-transition:enter-end="opacity-100 transform scale-100"
+                                                            x-transition:leave="transition ease-in duration-150"
+                                                            x-transition:leave-start="opacity-100 transform scale-100"
+                                                            x-transition:leave-end="opacity-0 transform scale-95"
+                                                            class="absolute right-0 mt-2 w-72 bg-white border border-gray-200 rounded-lg shadow-xl z-50"
+                                                            style="display: none;"
+                                                            x-cloak
+                                                        >
+                                                            <div class="py-2">
+                                                                @foreach($targetResponses as $response)
+                                                                    <a href="{{ route('profile.visit', $response->agency_id) }}" wire:navigate 
+                                                                    class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-b-0 group"
+                                                                    @click="open = false"
+                                                                    >
+                                                                        @if($response->agency && $response->agency->profile)
+                                                                            <img 
+                                                                                src="{{ asset('storage/' . $response->agency->profile->logo_path) }}"
+                                                                                class="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                                                                                alt="{{ $response->agency->name }}"
+                                                                            >
+                                                                        @endif
+                                                                        <div class="flex-1 min-w-0">
+                                                                            <p class="text-sm font-medium text-gray-900 truncate group-hover:text-indigo-600">{{ $response->agency->name ?? 'Unknown Agency' }}</p>
+                                                                            <p class="text-xs text-gray-500 capitalize">{{ str_replace('_', ' ', $response->status) }}</p>
+                                                                        </div>
+                                                                        <!-- Chat Button -->
+                                                                        <a 
+                                                                            href="{{ url('chatify', $response->agency_id) }}" 
+                                                                            target="_blank" 
+                                                                            rel="noopener noreferrer"
+                                                                            class="px-2 py-1 ml-2 mb-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs rounded-md whitespace-nowrap"
+                                                                        >
+                                                                            Chat
+                                                                        </a>
+                                                                    </a>
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
                                             @else
                                                 <span class="text-gray-400">—</span>
                                             @endif
                                         </div>
                                     </td>
+
                                     <td class="px-6 py-4 text-sm text-gray-600 flex items-center gap-2">
                                         <button 
                                             wire:click="evaluateProposals({{ $post->id }})"
-                                            class="text-green-600 hover:text-green-800 text-xs font-medium">
+                                            class="text-blue-600 hover:text-blue-800 text-xs font-medium">
                                             Evaluate Proposals
                                         </button>
 
-                                        <div x-data="{ open: false }" class="relative">
+                                        <button 
+                                            wire:click="selectCandidate({{ $post->id }})"
+                                            class="text-green-600 hover:text-green-800 text-xs font-medium">
+                                            Select Candidate
+                                        </button>
+
+                                        <div wire:ignore x-data="{ open2: false }" class="relative" x-cloak>
                                             <button 
-                                                @click="open = !open"
+                                                @click="open2 = !open2"
                                                 class="p-1 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" 
@@ -317,8 +316,8 @@
                                             </button>
 
                                             <div 
-                                                x-show="open"
-                                                @click.away="open = false"
+                                                x-show="open2"
+                                                @click.away="open2 = false"
                                                 x-transition
                                                 class="absolute right-0 mt-2 w-36 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
                                                 >
@@ -355,23 +354,31 @@
                                                             View 
                                                         </button>
                                                     </li>
-                                                    <li>
-                                                        <button 
-                                                            wire:click="editPost({{ $post->id }})"
-                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100 text-blue-600"
-                                                        >
-                                                            Edit
-                                                        </button>
+                                                    <li wire:ignore>
+                                                        <livewire:edit-post :post-id="$post->id" />
                                                     </li>
                                                     <li>
                                                         <button 
-                                                            wire:click="deletePost({{ $post->id }})"
-                                                            onclick="return confirm('Are you sure you want to delete this post?')"
-                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600"
+                                                            wire:click="archivePost({{ $post->id }})"
+                                                            :disabled="'{{ $post->status }}' !== 'open'"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600
+                                                                disabled:opacity-50 disabled:cursor-not-allowed"
                                                         >
-                                                            Delete
+                                                            Archive
                                                         </button>
                                                     </li>
+
+                                                    <li>
+                                                        <button 
+                                                            wire:click="unarchivePost({{ $post->id }})"
+                                                            :disabled="'{{ $post->status }}' !== 'archived'"
+                                                            class="w-full text-left px-4 py-2 hover:bg-gray-100 text-green-600
+                                                                disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        >
+                                                            Unarchive
+                                                        </button>
+                                                    </li>
+
                                                 </ul>
                                             </div>
                                         </div>
@@ -386,9 +393,6 @@
                     </div>
                 </div>
             </div>
-
-        @else
-            <livewire:evaluate-proposals :postId="$selectedPost->id" />
         @endif
     </div>
 

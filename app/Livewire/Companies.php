@@ -12,12 +12,11 @@ class Companies extends Component
     use WithPagination;
 
     public $searchKeyword = '';
-    public $searchLocation = []; // array for multiple checkbox selections
-    public $allLocations = [];   // store all existing locations
+    public $searchLocation = []; // ✅ Always array
+    public $allLocations = [];
 
     public function mount()
     {
-        // Fetch all distinct addresses from user profiles
         $this->allLocations = UserProfile::whereNotNull('address')
             ->distinct()
             ->pluck('address')
@@ -26,12 +25,19 @@ class Companies extends Component
 
     public function applySearch()
     {
+        // ✅ Ensure array format
+        if (is_string($this->searchLocation)) {
+            $this->searchLocation = [$this->searchLocation];
+        }
         $this->resetPage();
     }
 
-    public function goToCompanyProfile($postId)
+    public function updatedSearchLocation($value)
     {
-        return redirect()->route('company-profile', ['post' => $postId]);
+        // ✅ Convert string to array on checkbox change
+        if (is_string($value)) {
+            $this->searchLocation = [$value];
+        }
     }
 
     public function render()
@@ -54,8 +60,8 @@ class Companies extends Component
             });
         }
 
-        // Filter by selected locations
-        if (!empty($this->searchLocation)) {
+        // ✅ FIXED: Location filter - ensure array & exists
+        if (!empty($this->searchLocation) && is_array($this->searchLocation)) {
             $query->whereHas('user.profile', function($q) {
                 $q->whereIn('address', $this->searchLocation);
             });
@@ -65,8 +71,7 @@ class Companies extends Component
 
         return view('livewire.companies', [
             'posts' => $posts,
+            'allLocations' => $this->allLocations, // ✅ Pass to view
         ]);
     }
 }
-
-
