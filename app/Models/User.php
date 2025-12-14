@@ -30,9 +30,12 @@ class User extends Authenticatable
         'password',
         'account_status',
         'rejection_feedback',
-        'rating'
+        'rating',
+        'is_read',
     ];
-
+    protected $casts = [
+        'is_read' => 'boolean',
+    ];
     /**
      * The attributes that should be hidden for serialization.
      *

@@ -15,6 +15,7 @@ class UserProfile extends Model
 
     protected $fillable = [
         'user_id',
+        'is_read',
         'about_us',
         'logo_path',
         'bpl_path',

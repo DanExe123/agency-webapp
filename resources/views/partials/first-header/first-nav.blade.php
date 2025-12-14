@@ -76,10 +76,22 @@
         </div>
   
         <!-- Right -->
-         <div class="hidden md:flex items-center space-x-6">
+         <div class="hidden md:flex items-center space-x-2">
+         
+            @hasrole('Admin')
+            <livewire:admin-notif />
+            @endhasrole
+
+
+            @hasanyrole('Company|Agency')
+            <livewire:company-notif />
+
+            @endhasrole
+
                 @auth
                     <!-- Livewire Profile Dropdown -->
                     <div class="relative" x-data="{ open: false }">
+                        
                         <button @click="open = !open" class="flex items-center space-x-2 rounded-md hover:bg-gray-100 px-3 py-2">
                             @if(Auth::user()->profile && Auth::user()->profile->logo_path)
                                 <img src="{{ asset('storage/' . Auth::user()->profile->logo_path) }}" alt="Profile" class="w-8 h-8 rounded-full object-cover">
