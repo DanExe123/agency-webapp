@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Post;
 use App\Models\PostGuardNeed;
 use App\Models\SecurityGuardType;
+use App\Helpers\LogActivity;
 
 class CreatePost extends Component
 {
@@ -44,7 +45,6 @@ class CreatePost extends Component
 }
 
 
-
     public function submit()
     {
         $this->validate([
@@ -80,6 +80,8 @@ class CreatePost extends Component
                 'quantity' => $need['quantity'],
             ]);
         }
+
+        LogActivity::add('created a post: "' . $post->description); // this is what we fucking add
 
         // Reset form
         $this->reset(['description', 'requirements', 'guardNeeds']);

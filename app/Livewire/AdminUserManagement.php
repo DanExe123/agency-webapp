@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\UserProfile;
 use App\Models\User;
+use App\Helpers\LogActivity;
 
 class AdminUserManagement extends Component
 {
@@ -66,6 +67,9 @@ class AdminUserManagement extends Component
             $user->rejection_feedback = null;
             $user->save();
 
+            // Activity log
+            LogActivity::add('approved user application: "' . $user->name . '"');
+
             session()->flash('message', 'User approved.');
         }
     }
@@ -82,6 +86,8 @@ class AdminUserManagement extends Component
             $user->save();
         }
 
+        LogActivity::add('rejected user application: "' . $user->name . '"');
+
         $this->closeRejectModal();
     }
 
@@ -91,6 +97,8 @@ class AdminUserManagement extends Component
             $user->account_status = 'archived';
             $user->save();
         }
+
+        LogActivity::add('archived user: "' . $user->name . '"');
     }
 
     public function unarchive($userId)
@@ -99,6 +107,7 @@ class AdminUserManagement extends Component
             $user->account_status = 'verified';
             $user->save();
         }
+         LogActivity::add('unarchived user: "' . $user->name . '"');
     }
 
     public function render()

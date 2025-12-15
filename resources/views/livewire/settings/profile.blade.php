@@ -236,7 +236,7 @@
                 {{-- Other Details --}}
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     <div class="text-sm text-gray-500"><span class="font-semibold">Team Size:</span> {{ $profile->team_size ?? 'N/A' }}</div>
-                    <div class="text-sm text-gray-500"><span class="font-semibold">Established:</span> {{ optional($profile->year_established)->format('Y') ?? 'N/A' }}</div>
+                    <div class="text-sm text-gray-500"><span class="font-semibold">Established:</span>  {{ $profile && $profile->year_established ? \Carbon\Carbon::parse($profile->year_established)->format('Y') : 'N/A' }}</div>
                     <div class="text-sm text-gray-500"><span class="font-semibold">Phone:</span> {{ $profile->phone ?? 'N/A' }}</div>
                     <div class="text-sm text-gray-500"><span class="font-semibold">Type:</span> {{ $profile->organization_type ?? 'N/A' }}</div>
                 </div>

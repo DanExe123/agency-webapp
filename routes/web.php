@@ -23,6 +23,7 @@ use App\Livewire\SearchControl;
 
 //company
 use App\Livewire\CompanyDashboard;
+use App\Livewire\ActivityLogsTable;
 
 //ageny
 use App\Livewire\AgencyDashboard;
@@ -98,6 +99,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/profile', Profile::class)->name('settings.profile');
     Route::get('settings/password', Password::class)->name('settings.password');
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
+
+    Route::get('/Activity-logs', ActivityLogsTable::class)->name('Activity-logs');
 });
 
 

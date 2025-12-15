@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Post;
 use App\Models\PostGuardNeed;
 use App\Models\SecurityGuardType;
+use App\Helpers\LogActivity;
 
 class EditPost extends Component
 {
@@ -77,6 +78,10 @@ class EditPost extends Component
                 ]);
             }
         }
+
+        LogActivity::add(
+            'updated post: "' . $post->description . '"'
+        );
 
         $this->openSuccess = true;
         $this->dispatch('post-updated');

@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\Post;
 use App\Models\Notification;
+use App\Helpers\LogActivity;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -132,6 +133,7 @@ class EvaluateProposals extends Component
                                 $this->post->user->name .
                                 ' for "' . $this->post->description . '"',
                 ]);
+
             }
         }
 
@@ -152,6 +154,11 @@ class EvaluateProposals extends Component
                             ' for "' . $this->post->description . '"',
             ]);
         }
+
+        // ✅ Activity log for the company selecting the agency
+                LogActivity::add(
+                    'selected winner for post: "' . $this->post->description . '"',
+                );
 
         $this->post->update(['status' => 'proposed']);
 

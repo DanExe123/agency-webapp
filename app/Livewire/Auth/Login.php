@@ -3,6 +3,7 @@
 namespace App\Livewire\Auth;
 
 use Illuminate\Auth\Events\Lockout;
+use App\Helpers\LogActivity;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Session;
@@ -45,6 +46,8 @@ class Login extends Component
         session()->regenerate();
 
         $user = Auth::user()->load('profile'); // ✅ eager load profile
+
+        LogActivity::add('logged in');
 
         // 🚨 Force credentials route if Agency/Company has no profile
         if ($user->hasAnyRole(['Agency', 'Company']) && $user->profile === null) {

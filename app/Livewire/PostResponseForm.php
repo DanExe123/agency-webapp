@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Models\PostResponse;
 use App\Models\PostResponseRate;
 use App\Models\Notification;
+use App\Helpers\LogActivity;
 use Illuminate\Support\Facades\Auth;
 
 class PostResponseForm extends Component
@@ -70,6 +71,9 @@ class PostResponseForm extends Component
                             ' applied to your post: ' .
                             $this->post->description,
         ]);
+
+        // ✅ Add activity log here
+    LogActivity::add('Submitted a proposal for "' . $this->post->description . '"', );
 
 
         $this->reset(['message', 'proposedRates']);

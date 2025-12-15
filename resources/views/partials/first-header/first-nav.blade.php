@@ -113,6 +113,17 @@
                             <!-- Divider -->
                             <div class="border-t my-1"></div>
 
+                            <a wire:navigate href="{{ route('Activity-logs') }}" class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-black transition-colors duration-150">
+                                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                        d="M9 12h6m-6 4h6M5 6h14v14H5V6zM5 6V4a2 2 0 012-2h10a2 2 0 012 2v2" />
+                                </svg>
+                                Activity Logs
+                            </a>
+
+                            <!-- Divider -->
+                            <div class="border-t my-1"></div>
+
                             <!-- Logout Form -->
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf

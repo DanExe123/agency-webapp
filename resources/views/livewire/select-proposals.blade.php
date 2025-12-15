@@ -114,20 +114,15 @@
 
     <!-- Button to open DSS modal -->
     <div class="flex justify-end mt-4">
-        @php
-            // Check if ANY responses have status 'negotiating' OR 'accepted'
-            $hasNegotiatingOrAccepted = $post->responses->contains(function($response) {
-                return in_array($response->status, ['negotiating', 'accepted', 'completed_negotiating']);
-            });
-        @endphp
+       
 
-        @if(!$hasNegotiatingOrAccepted)
+      
             <button 
                 wire:click="openDssModal"
                 class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm">
                 Select Agency
             </button>
-        @endif
+      
     </div>
               
 

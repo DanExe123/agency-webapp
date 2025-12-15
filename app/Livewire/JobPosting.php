@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Post;
+use App\Helpers\LogActivity;
 use Illuminate\Support\Facades\Auth;
 use Livewire\WithPagination;
 
@@ -81,6 +82,9 @@ class JobPosting extends Component
             $newStatus = $post->status === 'closed' ? 'open' : 'closed';
             $post->update(['status' => $newStatus]);
             // no need to fetchPosts(), pagination will reload
+            LogActivity::add(
+                ucfirst($newStatus) . 'd post: "' . $post->description . '"'
+            );
         }
     }
 
@@ -91,6 +95,8 @@ class JobPosting extends Component
         if ($post) {
             $post->delete();
             // no need to fetchPosts(), pagination will reload
+
+            LogActivity::add('deleted post: "' . $post->description . '"',);
         }
     }
 
@@ -113,6 +119,8 @@ class JobPosting extends Component
 
         if ($post && $post->status === 'open') {
             $post->update(['status' => 'archived']);
+
+            LogActivity::add('archived post: "' . $post->description . '"');
         }
     }
 
@@ -124,6 +132,8 @@ class JobPosting extends Component
 
         if ($post && $post->status === 'archived') {
             $post->update(['status' => 'open']);
+
+            LogActivity::add('unarchived post: "' . $post->description . '"');
         }
     }
 
