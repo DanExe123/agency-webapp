@@ -55,3 +55,29 @@
         
     </form>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    window.addEventListener('account-pending', event => {
+        Swal.fire({
+            title: event.detail.title,
+            text: event.detail.text + " Please wait a few minutes to confirm your payment before proceeding to the dashboard.",
+            icon: 'warning', // You can use 'warning', 'info', 'error', 'success', 'question'
+            confirmButtonColor: '#000000',
+            confirmButtonText: 'OK'
+        });
+    });
+    <script>
+    window.addEventListener('account-pending', event => {
+        Swal.fire({
+            title: event.detail.title,
+            text: event.detail.text + " Please wait a few minutes to confirm your payment before proceeding to the dashboard.",
+            icon: 'warning', // You can use 'warning', 'info', 'error', 'success', 'question'
+            confirmButtonColor: '#000000',
+            confirmButtonText: 'OK'
+        });
+    });
+</script>
+
+</script>
+

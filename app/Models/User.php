@@ -32,6 +32,10 @@ class User extends Authenticatable
         'rejection_feedback',
         'rating',
         'is_read',
+        'payment_method',      
+        'payment_proof_path', 
+        'subscription_plan',   
+        'subscription_price',    
     ];
     protected $casts = [
         'is_read' => 'boolean',

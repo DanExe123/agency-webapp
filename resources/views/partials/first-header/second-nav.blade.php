@@ -1,4 +1,4 @@
-<header class="bg-white shadow-sm relative py-4">
+<header class="bg-white shadow-sm relative py-4" wire:ignore>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
         
@@ -68,13 +68,28 @@
         <!-- Right: Sign In Button -->
         <div>
           @guest
-              {{-- If not logged in, show Sign In and Create Account --}}
-              <div class="flex gap-2">
-                  <a wire:navigate href="{{ route('loginform') }}">
-                      <button class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100">
-                          Sign In
-                      </button>
-                  </a>
+              <!-- Sign In with SweetAlert -->
+              <button
+              type="button"
+              onclick="Swal.fire({
+                  icon: 'info',
+                  title: 'Subscription Required',
+                  text: 'You need an active subscription to access the Job Portal.',
+                  confirmButtonText: 'View Pricing',
+                  confirmButtonColor: '#000000',
+                  showCancelButton: true
+              }).then((result) => {
+                  if (result.isConfirmed) {
+                      window.location.href = '{{ route('pricingpage') }}#subscription';
+                  }
+              })"
+              class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100"
+          >
+              Sign In
+          </button>
+          
+
+          
 
                   <a wire:navigate href="{{ route('register') }}">
                       <button class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100">
@@ -82,6 +97,7 @@
                       </button>
                   </a>
               </div>
+          <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
           @endguest
 
           @auth

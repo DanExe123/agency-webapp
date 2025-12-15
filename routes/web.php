@@ -19,6 +19,8 @@ use App\Livewire\CompanyPosted;
 use App\Livewire\MostPopular;
 use App\Livewire\PostApplied;
 use App\Livewire\SearchControl;
+use App\Livewire\Pricingpage;
+use App\Livewire\SubscriptionControl;
 
 
 //company
@@ -53,7 +55,7 @@ Route::get('/download/{file}', [DownloadController::class, 'file'])
     ->where('file', '.*') // allow slashes
     ->name('download');
 
-
+Route::get('/pricingpage', Pricingpage::class)->name('pricingpage');
 
 
 // credential complete page not autheticated page
@@ -112,6 +114,7 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
     Route::get('/admin-PostManage', AdminPostManagement::class)->name('admin-PostManage'); 
 
     Route::get('/admin-Audit', AdminAuditTrail::class)->name('admin-Audit'); 
+    Route::get('/admin-subcriptioncontrol', SubscriptionControl::class)->name('subscription-control');
 
 });
 

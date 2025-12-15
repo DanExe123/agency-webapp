@@ -42,12 +42,36 @@ class Login extends Component
             ]);
         }
 
+        
+
         RateLimiter::clear($this->throttleKey());
         session()->regenerate();
 
         $user = Auth::user()->load('profile'); // ✅ eager load profile
 
         LogActivity::add('logged in');
+
+        if ($user->account_status === 'pending') {
+            $this->dispatch('account-pending', [
+                'title' => 'Account Pending',
+                'text' => 'Your account is still pending. Please wait a few minutes while we check your payment.',
+                'icon' => 'warning'
+            ]);
+    
+            Auth::logout(); // optional: log them out
+            return null; // STOP any further redirects
+        }
+
+        if ($user->subscription_end && now()->gt($user->subscription_end)) {
+            $this->dispatch('account-expired', [
+                'title' => 'Account Expired',
+                'text' => 'Your subscription has expired. Please renew to continue accessing the dashboard.',
+                'icon' => 'error'
+            ]);
+        
+            Auth::logout();
+            return null;
+        }
 
         // 🚨 Force credentials route if Agency/Company has no profile
         if ($user->hasAnyRole(['Agency', 'Company']) && $user->profile === null) {

@@ -36,8 +36,9 @@
   @include('partials.third-section')
 <!-- company post Section -->
   @include('partials.fourth-section')
-<!-- company post Section -->
-  @include('partials.fifth-section')
+  <hr>
+<!--  yudipotaa Section -->
+  @include('partials.subscription')
   <!-- footer Section -->
   @include('partials.footer')
 
