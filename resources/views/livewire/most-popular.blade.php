@@ -5,8 +5,8 @@
         @foreach($posts as $agency)
        
         @php 
-    $canVisit = auth()->check() && auth()->user()->account_status === 'verified'; 
-@endphp
+            $canVisit = auth()->check() && auth()->user()->account_status === 'verified'; 
+        @endphp
 
         <a  href="{{ $canVisit ? route('profile.visit', $agency->id) : '#' }}" wire:navigate 
             class="p-5 bg-white border rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-200 space-y-3 block">

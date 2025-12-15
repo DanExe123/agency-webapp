@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Post;
 use App\Models\PostResponse;
 use App\Models\PostResponseRate;
+use App\Models\Notification;
 use Illuminate\Support\Facades\Auth;
 
 class PostResponseForm extends Component
@@ -61,6 +62,15 @@ class PostResponseForm extends Component
                 ]);
             }
         }
+
+        Notification::create([
+            'sender_id'   => Auth::id(),              // agency
+            'receiver_id' => $this->post->user_id,    // company owner
+            'message'     =>  Auth::user()->name .
+                            ' applied to your post: ' .
+                            $this->post->description,
+        ]);
+
 
         $this->reset(['message', 'proposedRates']);
         foreach ($this->post->guardNeeds as $need) {

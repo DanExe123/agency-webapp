@@ -4,6 +4,9 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Post;
+use App\Models\Notification;
+use Illuminate\Support\Facades\Auth;
+
 
 class EvaluateProposals extends Component
 {
@@ -102,6 +105,7 @@ class EvaluateProposals extends Component
         }
     }
 
+
     public function proceedDssSelection()
     {
         $this->validate([
@@ -111,21 +115,43 @@ class EvaluateProposals extends Component
             'selectedAgencyIds.min' => 'Please select at least one agency before proceeding.',
         ]);
 
-        foreach ($this->selectedAgencyIds as $agencyId) {
-            $response = $this->post->responses()
-                ->where('agency_id', $agencyId)
-                ->first();
+        // 👉 FETCH ALL RESPONSES ONCE
+        $responses = $this->post->responses()->get();
 
+        // mark selected agencies as 'accepted' and notify
+        foreach ($this->selectedAgencyIds as $agencyId) {
+            $response = $responses->where('agency_id', $agencyId)->first();
             if ($response) {
                 $response->update(['status' => 'accepted']);
+
+                // 🔔 CREATE NOTIFICATION FOR SELECTED AGENCY
+                Notification::create([
+                    'sender_id'   => Auth::id(), // company
+                    'receiver_id' => $agencyId,  // agency
+                    'message' => 'Your proposal was selected as the winner by ' .
+                                $this->post->user->name .
+                                ' for "' . $this->post->description . '"',
+                ]);
             }
         }
 
-        // Update only responses currently with status 'negotiating' and not in selectedAgencyIds
-        $this->post->responses()
+        // mark unselected agencies (currently negotiating) as 'not_selected' and notify
+        $notSelectedResponses = $responses
             ->where('status', 'negotiating')
-            ->whereNotIn('agency_id', $this->selectedAgencyIds)
-            ->update(['status' => 'not_selected']);
+            ->whereNotIn('agency_id', $this->selectedAgencyIds);
+
+        foreach ($notSelectedResponses as $response) {
+            $response->update(['status' => 'not_selected']);
+
+            // 🔔 CREATE NOTIFICATION FOR NOT SELECTED AGENCY
+            Notification::create([
+                'sender_id'   => Auth::id(),               // company
+                'receiver_id' => $response->agency_id,     // agency
+                'message' => 'Your proposal was not selected by ' .
+                            $this->post->user->name .
+                            ' for "' . $this->post->description . '"',
+            ]);
+        }
 
         $this->post->update(['status' => 'proposed']);
 
@@ -135,6 +161,7 @@ class EvaluateProposals extends Component
 
         session()->flash('success', 'Selected agencies marked as accepted.');
     }
+
 
     public function render()
     {

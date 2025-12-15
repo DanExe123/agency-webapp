@@ -4,6 +4,9 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Post;
+use App\Models\Notification;
+use Illuminate\Support\Facades\Auth;
+
 
 class SelectProposals extends Component
 {
@@ -79,18 +82,41 @@ class SelectProposals extends Component
             'selectedAgencyIds.required' => 'Please select at least one agency before proceeding.',
         ]);
 
+        // 👉 FETCH ALL RESPONSES ONCE
+        $responses = $this->post->responses()->get();
+
         // mark selected agencies as 'negotiating'
         foreach ($this->selectedAgencyIds as $agencyId) {
-            $response = $this->post->responses()->where('agency_id', $agencyId)->first();
+            $response = $responses->where('agency_id', $agencyId)->first();
             if ($response) {
                 $response->update(['status' => 'negotiating']);
+
+                Notification::create([
+                    'sender_id'   => Auth::id(), // company
+                    'receiver_id' => $agencyId,  // agency
+                    'message' => 'Your proposal was selected as a candidate by ' .
+                                    $this->post->user->name .
+                                    ' for "' . $this->post->description . '"',
+                ]);
             }
         }
 
         // mark unselected agencies as 'not_selected'
-        $this->post->responses()
-            ->whereNotIn('agency_id', $this->selectedAgencyIds)
-            ->update(['status' => 'rejected']);
+        $notSelectedResponses = $responses
+            ->whereNotIn('agency_id', $this->selectedAgencyIds);
+
+        foreach ($notSelectedResponses as $response) {
+            $response->update(['status' => 'rejected']);
+
+            Notification::create([
+                'sender_id'   => Auth::id(),               // company
+                'receiver_id' => $response->agency_id,     // agency
+                'message' => 'Your proposal was not selected by ' .
+                                $this->post->user->name .
+                                ' for "' . $this->post->description . '"',
+
+            ]);
+        }
 
         $this->post->update(['status' => 'proposed']);
 

@@ -117,7 +117,7 @@
         @php
             // Check if ANY responses have status 'negotiating' OR 'accepted'
             $hasNegotiatingOrAccepted = $post->responses->contains(function($response) {
-                return in_array($response->status, ['negotiating', 'accepted']);
+                return in_array($response->status, ['negotiating', 'accepted', 'completed_negotiating']);
             });
         @endphp
 

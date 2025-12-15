@@ -21,7 +21,7 @@
 
         <ul class="max-h-80 overflow-y-auto divide-y">
             @forelse($notifications as $notif)
-                <li wire:click="markProfileAsRead({{ $notif['id'] }})"
+                <li wire:click="markAsRead('{{ $notif['id'] }}')"
                     class="px-4 py-3 flex items-start gap-3 rounded-md transition cursor-pointer {{ !$notif['is_read'] ? 'bg-gray-100 shadow-sm border-l-4 border-blue-500' : '' }}">
                     <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center">
                         <x-dynamic-component :component="'phosphor.icons::regular.' . $notif['icon']"
@@ -43,7 +43,7 @@
 
         @if($unreadCount > 0)
             <div class="p-2 border-t text-center">
-                <button wire:click="markAllProfilesAsRead" class="text-sm text-blue-600 hover:underline">
+                <button wire:click="markAllAsRead" class="text-sm text-blue-600 hover:underline">
                     Mark All as Read
                 </button>
             </div>
