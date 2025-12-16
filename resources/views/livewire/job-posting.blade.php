@@ -331,7 +331,7 @@
                                                     </li>
                                                     <li>
                                                         @if($post->status === 'closed')
-                                                            <button 
+                                                            <button             
                                                                 wire:click="togglePostStatus({{ $post->id }})"
                                                                 class="w-full text-left px-4 py-2 hover:bg-gray-100 text-green-600"
                                                             >

@@ -69,7 +69,7 @@
         <div>
           @guest
               <!-- Sign In with SweetAlert -->
-              <button
+              {{--<button
               type="button"
               onclick="Swal.fire({
                   icon: 'info',
@@ -77,7 +77,7 @@
                   text: 'You need an active subscription to access the Job Portal.',
                   confirmButtonText: 'View Pricing',
                   confirmButtonColor: '#000000',
-                  showCancelButton: true
+                  showCancelohglButton: true
               }).then((result) => {
                   if (result.isConfirmed) {
                       window.location.href = '{{ route('pricingpage') }}#subscription';
@@ -86,16 +86,36 @@
               class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100"
           >
               Sign In
-          </button>
-          
+          </button>--}}
 
-          
-
-                  <a wire:navigate href="{{ route('register') }}">
+          <a wire:navigate href="{{ route('loginform') }}">
                       <button class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100">
-                          Create Account
+                          Sign In
                       </button>
                   </a>
+          
+
+          
+{{-- tol gn saylo ko ang subcription plan route sa rigister button ...kay ind ka login biskan admin--}}
+                  
+                  <button
+              type="button"
+              onclick="Swal.fire({
+                  icon: 'info',
+                  title: 'Subscription Required',
+                  text: 'You need an active subscription to access the Job Portal.',
+                  confirmButtonText: 'View Pricing',
+                  confirmButtonColor: '#000000',
+                  showCancelohglButton: true
+              }).then((result) => {
+                  if (result.isConfirmed) {
+                      window.location.href = '{{ route('pricingpage') }}#subscription';
+                  }
+              })"
+              class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100"
+          >
+              Create Account
+          </button>
               </div>
           <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
           @endguest

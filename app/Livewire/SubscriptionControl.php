@@ -27,7 +27,7 @@ class SubscriptionControl extends Component
     {
         $user = User::find($userId);
         if ($user) {
-            $user->account_status = 'approved';
+            $user->account_status = 'verified';
             $user->save();
             $this->loadUsers(); // refresh the table
         }
@@ -53,7 +53,7 @@ class SubscriptionControl extends Component
     {
         $user = User::find($userId);
         if ($user) {
-            $user->account_status = 'approved';
+            $user->account_status = 'verified';
             $user->subscription_start = now(); // current date as start
     
             // Determine end date based on subscription plan

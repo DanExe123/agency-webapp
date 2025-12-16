@@ -145,10 +145,11 @@
 
 
             <!-- Submit -->
-            <div class="flex items-center justify-end">
-                <flux:button type="submit" variant="primary" class="w-full bg-black text-white hover:bg-gray-800">
+            <div class="flex items-center">
+                <button type="submit"  class=" w-full px-4 py-2 rounded-md border text-sm font-medium 
+                           bg-black text-white hover:bg-gray-800">
                     {{ __('Create Account') }}
-                </flux:button>
+                </button>
             </div>
         </form>
     @endif
