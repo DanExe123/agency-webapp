@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
+
 
 /**
  * App\Models\User
@@ -48,6 +50,11 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+    ];
+
+     protected $dates = [
+        'subscription_start',
+        'subscription_end',
     ];
 
     /**
@@ -117,6 +124,24 @@ class User extends Authenticatable
     {
         return $this->hasMany(Post::class, 'user_id');
     }
+
+    public function hasActiveSubscription(): bool
+    {
+        if (!$this->subscription_start || !$this->subscription_end) {
+            return false;
+        }
+
+        return Carbon::now()->between(
+            $this->subscription_start,
+            $this->subscription_end
+        );
+    }
+
+    //may uopdate ko di sa middleware ka subscription 
+
+    /**
+     
+    */
 
 
 }

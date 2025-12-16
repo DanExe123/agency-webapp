@@ -50,7 +50,7 @@ class Login extends Component
         $user = Auth::user()->load('profile'); // ✅ eager load profile
 
         LogActivity::add('logged in');
-
+/*
         if ($user->account_status === 'pending') {
             $this->dispatch('account-pending', [
                 'title' => 'Account Pending',
@@ -62,7 +62,9 @@ class Login extends Component
             return null; // STOP any further redirects
         }
 
-        if ($user->subscription_end && now()->gt($user->subscription_end)) {
+*/
+
+       /*  if ($user->subscription_end && now()->gt($user->subscription_end)) {
             $this->dispatch('account-expired', [
                 'title' => 'Account Expired',
                 'text' => 'Your subscription has expired. Please renew to continue accessing the dashboard.',
@@ -72,6 +74,7 @@ class Login extends Component
             Auth::logout();
             return null;
         }
+            */
 
         // 🚨 Force credentials route if Agency/Company has no profile
         if ($user->hasAnyRole(['Agency', 'Company']) && $user->profile === null) {

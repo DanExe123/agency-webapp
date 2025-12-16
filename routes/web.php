@@ -71,9 +71,7 @@ Route::get('/complete', function () {
 Route::get('/loginform', Login::class)->name('loginform');
 
 // Shared routes for Company + Agency
-Route::middleware(['auth', 'verified', 'role:Company|Agency'])->group(function () {
-    Route::get('/credentials', CredentialIndex::class)->name('credentials');
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+Route::middleware(['auth', 'verified', 'role:Company|Agency', 'subscribed'])->group(function () {
     Route::view('companies', 'company')->name('company');
     Route::get('company-profile/{post}', CompanyProfile::class)->name('company-profile');
     Route::get('/chat-with-company', ChatWithCompany::class)->name('chat-with-company');
@@ -88,8 +86,14 @@ Route::middleware(['auth', 'verified', 'role:Company|Agency'])->group(function (
 
 });
 
+Route::middleware(['auth', 'verified', 'role:Company|Agency'])->group(function () {
+    Route::get('/credentials', CredentialIndex::class)->name('credentials');
+    Route::view('dashboard', 'dashboard')->name('dashboard');
+
+});
+
 // specific feature  function for company only 
-Route::middleware(['auth', 'verified', 'role:Company'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:Company', 'subscribed'])->group(function () {
     Route::get('/Agencies-messages', AgenciesMessages::class)->name('agencies-messages');
     Route::get('/Create-Post', CreatePost::class)->name('create-post');
     Route::get('/Job-posting', JobPosting::class)->name('job-posting');
