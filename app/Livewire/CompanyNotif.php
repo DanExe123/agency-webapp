@@ -38,9 +38,12 @@ class CompanyNotif extends Component
                 'id' => 'profile_'.$profile->id,
                 'type' => 'account_status',
                 'message' => "Your account is {$status}",
-                'is_read' => $profile->is_read ?? false,
+                'is_read' => (bool) $profile->is_read,
                 'icon' => $status === 'verified' ? 'check-circle' : 'hourglass',
-                'color' => $profile->is_read ? 'text-gray-400' : ($status === 'verified' ? 'text-green-500' : 'text-yellow-500'),
+                'color' => $profile->is_read
+                    ? 'text-gray-400'
+                    : ($status === 'verified' ? 'text-green-500' : 'text-yellow-500'),
+                'created_at' => $profile->created_at, 
             ];
         }
 
@@ -54,15 +57,17 @@ class CompanyNotif extends Component
                 'id' => 'notif_'.$notif->id,
                 'type' => 'notification',
                 'message' => $notif->message,
-                'is_read' => $notif->is_read,
+                'is_read' => (bool) $notif->is_read,
                 'icon' => 'bell',
                 'color' => $notif->is_read ? 'text-gray-400' : 'text-blue-500',
+                'created_at' => $notif->created_at,
             ];
         }
 
         // Combine and sort
         $this->notifications = collect($notifications)
-            ->sortByDesc('id')
+            ->filter(fn ($n) => !empty($n['created_at']))
+            ->sortByDesc(fn ($n) => strtotime($n['created_at']))
             ->values()
             ->toArray();
 
@@ -84,44 +89,46 @@ class CompanyNotif extends Component
     }
 
     /**
-     * Mark a single notification (UserProfile or Notification) as read
-     */
-    public function markAsRead($id)
-    {
-        if (str_starts_with($id, 'profile_')) {
-            $profileId = str_replace('profile_', '', $id);
-            $profile = UserProfile::where('user_id', $this->user->id)
-                                  ->where('id', $profileId)
-                                  ->first();
-            if ($profile && !$profile->is_read) {
-                $profile->is_read = true;
-                $profile->save();
-            }
+ * Mark a single notification (UserProfile or Notification) as read
+ */
+public function markAsRead($id)
+{
+    if (str_starts_with($id, 'profile_')) {
+        $profileId = str_replace('profile_', '', $id);
+        $profile = UserProfile::where('user_id', $this->user->id)
+                              ->where('id', $profileId)
+                              ->first();
+        if ($profile && !$profile->is_read) {
+            $profile->is_read = true;
+            $profile->save();
         }
-
-        if (str_starts_with($id, 'notif_')) {
-            $notifId = str_replace('notif_', '', $id);
-            $notif = Notification::where('id', $notifId)
-                                 ->where('receiver_id', $this->user->id)
-                                 ->first();
-            if ($notif && !$notif->is_read) {
-                $notif->is_read = true;
-                $notif->save();
-            }
-        }
-
-        $this->loadNotifications();
     }
 
-    /**
-     * Mark all notifications as read (UserProfile + Notification)
-     */
-    public function markAllAsRead()
-    {
-        UserProfile::where('user_id', $this->user->id)->update(['is_read' => true]);
-        Notification::where('receiver_id', $this->user->id)->update(['is_read' => true]);
-        $this->loadNotifications();
+    if (str_starts_with($id, 'notif_')) {
+        $notifId = str_replace('notif_', '', $id);
+        $notif = Notification::where('id', $notifId)
+                             ->where('receiver_id', $this->user->id)
+                             ->first();
+        if ($notif && !$notif->is_read) {
+            $notif->is_read = true;
+            $notif->save();
+        }
     }
+
+    $this->loadNotifications(); // refresh list & counts
+}
+
+/**
+ * Mark all notifications as read (UserProfile + Notification)
+ */
+public function markAllAsRead()
+{
+    UserProfile::where('user_id', $this->user->id)->update(['is_read' => true]);
+    Notification::where('receiver_id', $this->user->id)->update(['is_read' => true]);
+
+    $this->loadNotifications(); // refresh list & counts
+}
+
 
     public function render()
     {

@@ -4,6 +4,8 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\User;
+use App\Models\Notification;
+use Carbon\Carbon;
 
 class AdminNotif extends Component
 {
@@ -11,91 +13,125 @@ class AdminNotif extends Component
     public $unreadCount = 0;
     public $user; // current user
 
+    protected $listeners = ['refreshComponent' => '$refresh'];
+
     public function mount()
     {
         $this->user = auth()->user(); 
-        $this->loadCounts();
+        $this->loadNotifications(); // unified loader
     }
 
-    public function loadCounts()
+    /**
+     * Load all notifications
+     */
+    public function loadNotifications()
     {
-        $pendingCount = User::where('account_status', 'pending')->count();
-
         $notifications = [];
 
+        // Pending users notification
+        $pendingUsers = User::role(['agency', 'company'])
+            ->where('account_status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $pendingCount = $pendingUsers->count();
+
         if ($pendingCount > 0) {
+            $latestPendingUser = $pendingUsers->first();
+
+            $isRead = $this->user->pending_users_read_at
+                && $this->user->pending_users_read_at >= ($latestPendingUser->created_at ?? now());
+
             $notifications[] = [
                 'id' => 1,
                 'type' => 'pending_user',
                 'message' => "You have {$pendingCount} pending user(s)",
-                'is_read' => $this->user->is_read ?? false, // from user model
+                'is_read' => $isRead,
                 'icon' => 'users',
-                'color' => 'text-blue-500'
+                'color' => $isRead ? 'text-gray-400' : 'text-blue-500',
+                'created_at' => $latestPendingUser ? $latestPendingUser->created_at : now(),
             ];
         }
 
-        $this->notifications = $notifications;
-        $this->unreadCount = collect($notifications)->where('is_read', false)->count();
-    }
+        // Custom notifications
+        $customNotifs = Notification::where('receiver_id', $this->user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-       // New function for company account notifications
-    // ------------------------------
-    public function loadCompanyStatusNotifications()
-    {
-        $notifications = [];
-
-        if ($this->user->account_status === 'pending') {
+        foreach ($customNotifs as $notif) {
             $notifications[] = [
-                'id' => 101,
-                'type' => 'company_pending',
-                'message' => "Your account is still pending for verification",
-                'is_read' => $this->user->is_read ?? false,
-                'icon' => 'hourglass', // Phosphor icon
-                'color' => 'text-yellow-500',
-            ];
-        } elseif ($this->user->account_status === 'verified') {
-            $notifications[] = [
-                'id' => 102,
-                'type' => 'company_verified',
-                'message' => "Your account has been successfully verified",
-                'is_read' => $this->user->is_read ?? false,
-                'icon' => 'check-circle', // Phosphor icon
-                'color' => 'text-green-500',
+                'id' => 'notif_' . $notif->id,
+                'type' => 'notification',
+                'message' => $notif->message,
+                'is_read' => (bool) $notif->is_read,
+                'icon' => 'bell',
+                'color' => $notif->is_read ? 'text-gray-400' : 'text-blue-500',
+                'created_at' => $notif->created_at,
             ];
         }
 
-        $this->notifications = $notifications;
-        $this->unreadCount = collect($notifications)->where('is_read', false)->count();
-    }
-    // Mark all notifications as read (update user model)
-    public function markAsRead()
-    {
-        $this->user->is_read = true;
-        $this->user->save();
-
-        foreach ($this->notifications as &$notif) {
-            $notif['is_read'] = true;
-        }
-
-        $this->unreadCount = 0;
-    }
-
-    // Mark a single notification as read
-    public function markSingleAsRead($type, $id)
-    {
-        foreach ($this->notifications as &$notif) {
-            if (($notif['type'] ?? null) === $type && ($notif['id'] ?? null) == $id) {
-                $notif['is_read'] = true;
-                $this->user->is_read = true; // update user model
-                $this->user->save();
-            }
-        }
+        // Sort by created_at descending
+        $this->notifications = collect($notifications)
+            ->filter(fn($n) => !empty($n['created_at']))
+            ->sortByDesc(fn($n) => strtotime($n['created_at']))
+            ->values()
+            ->toArray();
 
         $this->unreadCount = collect($this->notifications)->where('is_read', false)->count();
     }
 
+    /**
+     * Mark a single notification as read
+     */
+    public function markAsRead($id)
+    {
+        foreach ($this->notifications as &$notif) {
+            if ($notif['id'] == $id) { // loose comparison works for both string and int
+                $notif['is_read'] = true;
+
+                // Pending user notification
+                if ((int)$id === 1) {
+                    $this->user->pending_users_read_at = now();
+                    $this->user->save();
+                }
+
+                // Custom notifications
+                if (str_starts_with($id, 'notif_')) {
+                    $notifId = str_replace('notif_', '', $id);
+                    $dbNotif = Notification::find($notifId);
+                    if ($dbNotif) {
+                        $dbNotif->is_read = true;
+                        $dbNotif->save();
+                    }
+                }
+            }
+        }
+
+        // Update unread count
+        $this->unreadCount = collect($this->notifications)->where('is_read', false)->count();
+    }
+
+    /**
+     * Mark all notifications as read
+     */
+    public function markAllAsRead()
+    {
+        // Mark pending user notification
+        $this->user->pending_users_read_at = now();
+        $this->user->save();
+
+        // Mark all custom notifications
+        Notification::where('receiver_id', $this->user->id)
+            ->update(['is_read' => true]);
+
+        $this->loadNotifications();
+    }
+
     public function render()
     {
-        return view('livewire.admin-notif');
+        return view('livewire.admin-notif', [
+            'notifications' => $this->notifications,
+            'unreadCount' => $this->unreadCount,
+        ]);
     }
 }

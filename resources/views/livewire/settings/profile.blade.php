@@ -5,7 +5,7 @@
             $user = auth()->user();
         @endphp
 
-        @if($user)
+        @if($user && $user->profile) {{-- only show if user has a profile --}}
             @if($user->account_status === 'pending')
                 <div class="mb-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800">
                     Your account is currently <strong>Pending</strong>. Please wait for verification.
@@ -185,9 +185,27 @@
             @php
                 $user = auth()->user();
                 $profile = $user->profile;
+                $isIncomplete = 
+                    !$profile ||
+                    !$profile->bpl_path ||
+                    !$profile->dti_path ||
+                    !$profile->logo_path ||
+                    empty($profile->organization_type) ||
+                    empty($profile->industry_type);
             @endphp
 
-            <div class="max-w-5xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+            <div class="max-w-5xl mx-auto p-6 bg-white rounded-lg border">
+                @if($isIncomplete)
+                <div class="border-l-4 border-b border-yellow-500 text-yellow-700 p-4 mb-6 flex justify-between items-center">
+                    <div>
+                        <p class="font-semibold">Finish your profile or verification process.</p>
+                        <p class="text-sm">Some required information or documents are missing.</p>
+                    </div>
+                    <a href="{{ route('credentials') }}" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded">
+                        Complete Now
+                    </a>
+                </div>
+            @endif
                 <div class="flex flex-col md:flex-row md:items-center gap-6 mb-8">
                     {{-- Logo --}}
                     <div class="w-28 h-28 rounded-full overflow-hidden border border-gray-200">
@@ -241,14 +259,28 @@
                     <div class="text-sm text-gray-500"><span class="font-semibold">Type:</span> {{ $profile->organization_type ?? 'N/A' }}</div>
                 </div>
 
-                {{-- File Links --}}
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
 
+                @php
+                    function truncateFileName($fileName, $limit = 12) {
+                        $ext = pathinfo($fileName, PATHINFO_EXTENSION);
+                        $name = pathinfo($fileName, PATHINFO_FILENAME);
+
+                        if (strlen($name) > $limit) {
+                            $name = Str::limit($name, $limit, '...');
+                        }
+
+                        return $name . '.' . $ext;
+                    }
+                @endphp
+                                {{-- File Links --}}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                     {{-- BPL --}}
                     <div>
                         <h3 class="font-semibold text-gray-700 mb-1">BPL</h3>
                         @if($profile && $profile->bpl_path)
-                            <a href="{{ asset('storage/' . $profile->bpl_path) }}" target="_blank" class="text-blue-600 underline">{{ $profile->bpl_original_name ?? 'View BPL' }}</a>
+                            <a href="{{ asset('storage/' . $profile->bpl_path) }}" target="_blank" class="text-blue-600 underline">
+                                {{ truncateFileName($profile->bpl_original_name ?? 'View BPL') }}
+                            </a>
                         @else
                             <p class="text-gray-500 text-sm">No BPL uploaded</p>
                         @endif
@@ -258,11 +290,14 @@
                     <div>
                         <h3 class="font-semibold text-gray-700 mb-1">DTI</h3>
                         @if($profile && $profile->dti_path)
-                            <a href="{{ asset('storage/' . $profile->dti_path) }}" target="_blank" class="text-blue-600 underline">{{ $profile->dti_original_name ?? 'View DTI' }}</a>
+                            <a href="{{ asset('storage/' . $profile->dti_path) }}" target="_blank" class="text-blue-600 underline">
+                                {{ truncateFileName($profile->dti_original_name ?? 'View DTI') }}
+                            </a>
                         @else
                             <p class="text-gray-500 text-sm">No DTI uploaded</p>
                         @endif
                     </div>
+
                 </div>
 
                 {{-- Feedbacks --}}

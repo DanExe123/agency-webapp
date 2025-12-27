@@ -125,17 +125,25 @@ class User extends Authenticatable
         return $this->hasMany(Post::class, 'user_id');
     }
 
-    public function hasActiveSubscription(): bool
-    {
-        if (!$this->subscription_start || !$this->subscription_end) {
-            return false;
-        }
+   public function payments()
+{
+    return $this->hasMany(Payment::class);
+}
 
-        return Carbon::now()->between(
-            $this->subscription_start,
-            $this->subscription_end
-        );
-    }
+public function activePayment()
+{
+    return $this->payments()
+                ->where('status', 'approved')
+                ->whereNotNull('expires_at')
+                ->where('expires_at', '>=', now())
+                ->latest('expires_at');
+}
+
+public function hasActiveSubscription(): bool
+{
+    return $this->activePayment()->exists();
+}
+
 
     //may uopdate ko di sa middleware ka subscription 
 

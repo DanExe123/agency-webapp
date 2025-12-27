@@ -9,18 +9,17 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+   public function up()
 {
     Schema::table('users', function (Blueprint $table) {
-        $table->string('payment_method')->nullable();
-        $table->string('payment_proof_path')->nullable();
+        $table->timestamp('pending_users_read_at')->nullable()->after('is_read');
     });
 }
 
-public function down(): void
+public function down()
 {
     Schema::table('users', function (Blueprint $table) {
-        $table->dropColumn(['payment_method', 'payment_proof_path']);
+        $table->dropColumn('pending_users_read_at');
     });
 }
 

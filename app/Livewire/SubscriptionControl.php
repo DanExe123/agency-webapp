@@ -3,77 +3,106 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\User;
+use App\Models\Payment;
+use App\Models\Notification;
+use App\Helpers\LogActivity;
+use Illuminate\Support\Facades\Auth;
 
 class SubscriptionControl extends Component
 {
-    public $users;
+    public $payments;
+    public $remarks;
 
     public function mount()
     {
-        $this->loadUsers();
+        $this->loadPayments();
     }
 
-    public function loadUsers()
+    public function loadPayments()
     {
-        // Load all users, you can filter roles if needed
-        $this->users = User::all();
+        $this->payments = Payment::with('user')
+            ->orderBy('created_at', 'desc')
+            ->get();
     }
 
-    /**
-     * Approve a user's subscription/account
-     */
-    public function approve($userId)
+    public function approve($paymentId)
     {
-        $user = User::find($userId);
-        if ($user) {
-            $user->account_status = 'verified';
-            $user->save();
-            $this->loadUsers(); // refresh the table
+        $payment = Payment::find($paymentId);
+        if (!$payment) return;
+
+        $payment->status = 'approved';
+
+        // Set expires_at based on plan
+        if ($payment->plan === 'monthly') {
+            $payment->expires_at = now()->addMonth();
+        } else {
+            $payment->expires_at = now()->addYear();
         }
+
+        $payment->save();
+
+        // Update user account status
+        if ($payment->user) {
+            $payment->user->account_status = 'verified';
+            $payment->user->save();
+
+            // Create notification for the user
+            Notification::create([
+                'sender_id'   => Auth::id(), // admin who approved
+                'receiver_id' => $payment->user->id,
+                'message'     => "Your subscription payment for {$payment->plan} has been approved.",
+                'is_read'     => false,
+            ]);
+        }
+
+        // Log admin activity
+        LogActivity::add(
+            "Approved subscription for user {$payment->user?->name} (ID: {$payment->user_id})",
+            'SubscriptionControl::approve'
+        );
+
+        $this->loadPayments();
     }
 
-    /**
-     * Reject a user's subscription/account
-     */
-    public function reject($userId)
-    {
-        $user = User::find($userId);
-        if ($user) {
-            $user->account_status = 'rejected';
-            $user->save();
-            $this->loadUsers(); // refresh the table
-        }
+    public function reject($paymentId)
+{
+    $payment = Payment::find($paymentId);
+    if (!$payment) return;
+
+    // Validate remarks is required
+    $this->validate([
+        'remarks' => 'required|string|max:1000',
+    ]);
+
+    $payment->status = 'rejected';
+    $payment->remarks = $this->remarks; // save remarks
+    $payment->save();
+
+    // Notify user
+    if ($payment->user) {
+        Notification::create([
+            'sender_id'   => Auth::id(),
+            'receiver_id' => $payment->user->id,
+            'message'     => "Your subscription payment for {$payment->plan} has been rejected. Reason: {$this->remarks}",
+            'is_read'     => false,
+        ]);
     }
 
-    /**
-     * Mark a user's payment as confirmed
-     */
-    public function confirmPayment($userId)
-    {
-        $user = User::find($userId);
-        if ($user) {
-            $user->account_status = 'verified';
-            $user->subscription_start = now(); // current date as start
-    
-            // Determine end date based on subscription plan
-            if ($user->subscription_plan === 'Monthly Access') {
-                $user->subscription_end = now()->addMonth();
-            } elseif ($user->subscription_plan === '1-Year Promo Access') {
-                $user->subscription_end = now()->addYear();
-            }
-    
-            $user->save();
-    
-            $this->loadUsers(); // refresh table
-        }
-    }
-    
+    // Log admin activity
+    LogActivity::add(
+        "Rejected subscription for user {$payment->user?->name} (ID: {$payment->user_id}). Remarks: {$this->remarks}",
+        'SubscriptionControl::reject'
+    );
+
+    $this->remarks = null; // reset
+    $this->loadPayments();
+}
+
 
     public function render()
     {
         return view('livewire.subscription-control', [
-            'users' => $this->users,
+            'payments' => $this->payments,
         ]);
     }
 }

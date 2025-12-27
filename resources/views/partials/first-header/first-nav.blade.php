@@ -18,10 +18,6 @@
                         Post Management
                         <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
                     </a>
-                    <a wire:navigate href="{{ route('admin-Audit') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
-                        Audit Trail
-                        <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
-                    </a>
                     <a wire:navigate href="{{ route('subscription-control') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
                         Subscription Control
                         <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
@@ -67,14 +63,28 @@
                   @endif
               @endhasrole
 
-              @hasanyrole('Company|Agency')
-                @if(Auth::user()->account_status === 'verified')
-                  <a  href="{{ route('chatify') }}" target="_blank"  class="relative group text-gray-500 hover:text-blue-600 transition-colors">
-                      Messages
-                      <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
-                  </a>
-                @endif
-              @endhasanyrole
+
+                @hasanyrole('Company|Agency')
+                    @if(Auth::user()->account_status === 'verified')
+
+                        @if(auth()->user()->hasActiveSubscription())
+                            {{-- SUBSCRIBED → GO TO CHATIFY --}}
+                            <a href="{{ route('chatify') }}" target="_blank"
+                            class="relative group text-gray-500 hover:text-blue-600 transition-colors">
+                                Messages
+                                <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                            </a>
+                        @else
+                            {{-- NOT SUBSCRIBED → OPEN MODAL --}}
+                            <a wire:navigate href="{{ route('pricingpage') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
+                                Messages
+                                <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                            </a>
+                        @endif
+
+                    @endif
+                @endhasanyrole
+
           </nav>
            
         </div>

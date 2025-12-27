@@ -14,16 +14,16 @@ class EnsureSubscriptionIsActive
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle($request, Closure $next)
-{
-    $user = auth()->user();
+    {
+        $user = auth()->user();
 
-    if (!$user || !$user->hasActiveSubscription()) {
-        return redirect()
-            ->route('pricingpage')
-            ->with('error', 'You need an active subscription.');
+        if (!$user || !$user->hasActiveSubscription()) {
+            return redirect()
+                ->route('pricingpage')
+                ->with('error', 'You need an active subscription.');
+        }
+
+        return $next($request);
     }
-
-    return $next($request);
-}
 
 }

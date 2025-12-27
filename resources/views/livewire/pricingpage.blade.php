@@ -43,30 +43,13 @@
               </li>
             </ul>
             <button
-            type="button"
-            onclick="Swal.fire({
-                icon: 'question',
-                title: 'Confirm Subscription',
-                text: 'Do you want to access the Monthly Plan for ₱500?',
-                confirmButtonText: 'Yes, Continue',
-                confirmButtonColor: '#000000',
-                showCancelButton: true,
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Save selection in localStorage
-                    localStorage.setItem('selectedPlan', JSON.stringify({
-                        plan: 'Monthly Access',
-                        price: 500
-                    }));
-                    Livewire.navigate('{{ route('register') }}');
-                }
-            })"
-            aria-describedby="tier-hobby"
-            class="mt-8 block w-full rounded-md px-3.5 py-2.5 text-center text-sm font-semibold text-gray-900 inset-ring inset-ring-indigo-200 hover:inset-ring-indigo-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:mt-10"
-        >
-        Get started today
+                wire:navigate
+                href="{{ route('checkout', ['plan' => 'monthly']) }}"
+                class="mt-8 block w-full rounded-md px-3.5 py-2.5 text-sm font-semibold text-gray-900"
+            >
+                Get started today
             </button>
+
           </div>
           <div class="relative rounded-3xl bg-gray-900 p-8 shadow-2xl ring-1 ring-gray-900/10 sm:p-10">
             <h3 id="tier-enterprise" class="text-base/7 font-semibold text-white">1-Year Promo Access</h3>
@@ -114,30 +97,13 @@
               </li>
             </ul>
             <button
-                type="button"
-                onclick="Swal.fire({
-                    icon: 'question',
-                    title: 'Confirm Subscription',
-                    text: 'Do you want to access the 1-Year Promo Plan for ₱2,500?',
-                    confirmButtonText: 'Yes, Continue',
-                    confirmButtonColor: '#000000',
-                    showCancelButton: true,
-                    cancelButtonText: 'Cancel'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Save selection in localStorage
-                        localStorage.setItem('selectedPlan', JSON.stringify({
-                            plan: '1-Year Promo Access',
-                            price: 2500
-                        }));
-                        Livewire.navigate('{{ route('register') }}');
-                    }
-                })"
-                aria-describedby="tier-enterprise"
-                class="mt-8 block w-full rounded-md bg-gray-100 px-3.5 py-2.5 text-center text-sm font-semibold text-gray-900 shadow-xs hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 sm:mt-10"
-            >
-                Get started today
-            </button>
+    wire:navigate
+    href="{{ route('checkout', ['plan' => 'yearly']) }}"
+    class="mt-8 block w-full rounded-md bg-gray-100 px-3.5 py-2.5 text-sm font-semibold text-gray-900"
+>
+    Get started today
+</button>
+
         
           </div>
         </div>

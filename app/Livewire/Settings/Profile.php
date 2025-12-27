@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Illuminate\Support\Str;
 
 class Profile extends Component
 {
@@ -138,13 +139,21 @@ class Profile extends Component
             ]);
         }
 
+        \App\Helpers\LogActivity::add("updated profile");
+
+        // ------------------------
+        // CREATE NOTIFICATION FOR ADMIN
+        // ------------------------
+        \App\Models\Notification::create([
+            'sender_id'   => $user->id,
+            'receiver_id' => 1, // admin only
+            'message'     => "{$user->name} has updated its profile",
+            'is_read'     => false,
+        ]);
+
         $this->isEditing = false;
         $this->dispatch('profile-updated', name: $user->name);
     }
-
-    
-
-
 
     /**
      * Send an email verification notification to the current user.

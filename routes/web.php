@@ -38,6 +38,8 @@ use App\Livewire\AdminAuditTrail;
 
 use App\Http\Controllers\DownloadController;
 
+use App\Livewire\Checkout;
+
 
 use App\Livewire\ProfileVisit;
 
@@ -99,6 +101,8 @@ Route::middleware(['auth', 'verified', 'role:Company', 'subscribed'])->group(fun
     Route::get('/Job-posting', JobPosting::class)->name('job-posting');
 });
 
+
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
@@ -107,6 +111,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
 
     Route::get('/Activity-logs', ActivityLogsTable::class)->name('Activity-logs');
+
+    Route::get('/checkout/{plan}', Checkout::class)
+    ->name('checkout');
 });
 
 
