@@ -63,34 +63,25 @@
                   @endif
               @endhasrole
 
-
-                @hasanyrole('Company|Agency')
-                    @if(Auth::user()->account_status === 'verified')
-
-                        @if(auth()->user()->hasActiveSubscription())
-                            {{-- SUBSCRIBED → GO TO CHATIFY --}}
-                            <a href="{{ route('chatify') }}" target="_blank"
-                            class="relative group text-gray-500 hover:text-blue-600 transition-colors">
-                                Messages
-                                <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
-                            </a>
-                        @else
-                            {{-- NOT SUBSCRIBED → OPEN MODAL --}}
-                            <a wire:navigate href="{{ route('pricingpage') }}" class="relative group text-gray-500 hover:text-blue-600 transition-colors">
-                                Messages
-                                <span class="absolute left-0 -bottom-[18px] w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
-                            </a>
-                        @endif
-
-                    @endif
-                @endhasanyrole
-
           </nav>
            
         </div>
   
         <!-- Right -->
          <div class="hidden md:flex items-center space-x-2">
+
+            @hasanyrole('Company|Agency')
+                @if(Auth::user()->account_status === 'verified')
+                    @if(auth()->user()->hasActiveSubscription())
+                        <livewire:messages-nav />
+                    @else
+                        <a wire:navigate href="{{ route('pricingpage') }}"
+                           class="relative text-gray-500 hover:text-black transition">
+                        </a>
+                    @endif
+
+                @endif
+            @endhasanyrole
          
             @hasrole('Admin')
             <livewire:admin-notif />

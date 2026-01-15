@@ -68,7 +68,7 @@
                             {{ $response->created_at->diffForHumans() }}
                         </td>
                         <td class="px-4 py-2 text-center">
-                            <a href="{{ url('chatify', $response->post->user_id) }}"  target="_blank" 
+                            <a href="{{ route('chat-list', ['user' => $response->post->user_id]) }}"
                             class="inline-block px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs rounded-md">
                                 Chat with Company
                             </a>

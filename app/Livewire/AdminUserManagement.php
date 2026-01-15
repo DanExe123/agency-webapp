@@ -128,7 +128,7 @@ class AdminUserManagement extends Component
                     $u->where('account_status', $this->statusFilter);
                 });
             })
-
+            ->orderBy('created_at', 'desc')
             ->paginate(10);
 
         return view('livewire.admin-user-management', [

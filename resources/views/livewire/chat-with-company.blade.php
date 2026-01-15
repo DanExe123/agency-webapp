@@ -56,7 +56,7 @@
     </header>
     
    <!-- <div class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-12 gap-6"> -->
-        <div class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 md:grid-cols-12 gap-6">
+        <div class="max-w-7xl bg-re-200 mx-auto px-4 py-6 grid grid-cols-1 md:grid-cols-12 gap-6">
         <!-- Company Details -->
         <!--<aside class="col-span-4 bg-white border rounded-md p-6">-->
             <aside class="md:col-span-4 bg-white border rounded-md p-6">

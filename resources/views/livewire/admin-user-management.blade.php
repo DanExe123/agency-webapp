@@ -34,6 +34,7 @@
                         <th class="px-4 py-2">Year</th>
                         <th class="px-4 py-2">Website</th>
                         <th class="px-4 py-2">Account status</th>
+                        <th class="px-4 py-2">Registered At</th>
                         <th class="px-4 py-2">Action</th>
                     </tr>
                 </thead>
@@ -58,6 +59,10 @@
                             {{ ucfirst($profile->user->account_status) }}
                         </span>
                     </td>
+                    <td class="px-4 py-2 text-gray-600 text-xs">
+                        {{ $profile->user->created_at->format('M d, Y h:i A') }}
+                    </td>
+
 
                     
                     <td class="px-4 py-2" x-data="{ openMenu:false, openDocs:false, fullscreenImage: null, openApproveConfirm: false, selectedUserId: null,  openRejectConfirm: false, }" class="relative">

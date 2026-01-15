@@ -40,7 +40,7 @@ use App\Http\Controllers\DownloadController;
 
 use App\Livewire\Checkout;
 
-
+use App\Livewire\ChatList;
 use App\Livewire\ProfileVisit;
 
 
@@ -77,7 +77,9 @@ Route::middleware(['auth', 'verified', 'role:Company|Agency', 'subscribed'])->gr
     Route::view('companies', 'company')->name('company');
     Route::get('company-profile/{post}', CompanyProfile::class)->name('company-profile');
     Route::get('/chat-with-company', ChatWithCompany::class)->name('chat-with-company');
-    Route::get('/Agencies-messages', AgenciesMessages::class)->name('agencies-messages');
+    Route::get('/chat', \App\Livewire\ChatList::class)
+    ->name('chat-list');
+
     Route::get('/posted', CompanyPosted::class)->name('company-posted');
     Route::get('/Most-popular', MostPopular::class)->name('most-popular');
     Route::get('/Post-applied', PostApplied::class)->name('post-applied');
